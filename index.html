@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>WC26 Predictor — FIFA World Cup 2026</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --ink:#0b1220; --mut:#5b6577; --line:#e4e8f0;
+  --acc:#1255cc; --acc2:#0ea36f; --warn:#d97706; --live:#dc2626; --chip:#eef2f9;
+  --bar:#ffffffee; --shadow:0 1px 3px rgba(10,20,40,.08);
+}
+.dark{
+  --bg:#0b1220; --card:#141d2f; --ink:#e8edf6; --mut:#93a0b4; --line:#243046;
+  --acc:#5b8def; --acc2:#2dd497; --warn:#f59e0b; --live:#f87171; --chip:#1c2740;
+  --bar:#101828ee; --shadow:0 1px 3px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:76px;min-height:100vh}
+header{position:sticky;top:0;z-index:30;background:var(--bar);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 14px 8px}
+header h1{font-size:1.05rem;display:flex;align-items:center;gap:8px}
+header h1 .dot{width:8px;height:8px;border-radius:50%;background:var(--acc2);display:inline-block}
+header .sub{font-size:.72rem;color:var(--mut);margin-top:2px}
+.iconbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;font-size:.85rem;cursor:pointer}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;background:var(--chip);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 13px;font-size:.82rem;cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+main{padding:0 12px;max-width:680px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.datehead{font-size:.78rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin:16px 4px 8px}
+.match{padding:10px 12px;cursor:pointer}
+.match+.match{border-top:1px solid var(--line)}
+.mtop{display:flex;justify-content:space-between;font-size:.7rem;color:var(--mut);margin-bottom:6px}
+.mrow{display:flex;align-items:center;gap:8px}
+.team{flex:1;display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:600;min-width:0}
+.team .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team.right{justify-content:flex-end;text-align:right}
+.flag{font-size:1.25rem;line-height:1}
+.score{flex:0 0 auto;min-width:64px;text-align:center;font-weight:800;font-size:1.05rem}
+.score .tm{display:block;font-size:.65rem;font-weight:600;color:var(--mut)}
+.score.live{color:var(--live)}
+.pbar{display:flex;height:5px;border-radius:3px;overflow:hidden;margin-top:8px;background:var(--line)}
+.pbar i{display:block;height:100%}
+.pbar .h{background:var(--acc)} .pbar .d{background:#9aa4b8} .pbar .a{background:var(--acc2)}
+.plabels{display:flex;justify-content:space-between;font-size:.66rem;color:var(--mut);margin-top:3px}
+.badge{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--chip);color:var(--mut)}
+.badge.live{background:var(--live);color:#fff;animation:pulse 1.4s infinite}
+.badge.ft{background:var(--chip)}
+.badge.pick{background:var(--warn);color:#fff}
+@keyframes pulse{50%{opacity:.55}}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:7px 8px;text-align:center;border-top:1px solid var(--line)}
+th{font-size:.66rem;color:var(--mut);text-transform:uppercase;border-top:none}
+td.tn{text-align:left;font-weight:600;white-space:nowrap}
+tr.q1 td:first-child{box-shadow:inset 3px 0 0 var(--acc2)}
+tr.q3 td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+.grouphead{padding:10px 12px;font-weight:800;font-size:.9rem;display:flex;justify-content:space-between;align-items:center}
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--bar);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;background:none;border:none;color:var(--mut);font-size:.62rem;padding:8px 0 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabbar button .ic{font-size:1.25rem;line-height:1}
+.tabbar button.on{color:var(--acc);font-weight:700}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(5,10,20,.55);display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:680px;max-height:88vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h3{font-size:1rem;margin-bottom:4px}
+.grab{width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+.btn{display:inline-block;border:none;border-radius:10px;padding:10px 16px;font-size:.88rem;font-weight:700;cursor:pointer;background:var(--acc);color:#fff}
+.btn.sec{background:var(--chip);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
+.btn:disabled{opacity:.5}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:8px 0}
+.seg button{flex:1;border:none;background:var(--card);color:var(--ink);padding:9px 4px;font-size:.8rem;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+.statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.stat{background:var(--chip);border-radius:10px;padding:8px;text-align:center}
+.stat b{display:block;font-size:1.05rem}
+.stat span{font-size:.62rem;color:var(--mut);text-transform:uppercase}
+input[type=text],input[type=password],input[type=number]{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:.9rem}
+input[type=range]{width:100%}
+.note{font-size:.74rem;color:var(--mut);line-height:1.45;margin:6px 0}
+.bracketwrap{overflow-x:auto;padding:4px 0 12px}
+.bracket{display:flex;gap:10px;min-width:900px}
+.bcol{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:8px}
+.bcol h4{font-size:.66rem;color:var(--mut);text-align:center;text-transform:uppercase}
+.bm{background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:.74rem;overflow:hidden}
+.bm .bt{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;cursor:pointer;gap:4px}
+.bm .bt+.bt{border-top:1px solid var(--line)}
+.bm .bt.w{font-weight:800;background:color-mix(in srgb,var(--acc2) 14%,transparent)}
+.bm .bt .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bm .meta{font-size:.58rem;color:var(--mut);padding:2px 8px 4px;border-top:1px dashed var(--line)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.scorein{display:flex;align-items:center;gap:10px;justify-content:center;margin:10px 0}
+.scorein .stp{display:flex;align-items:center;gap:8px}
+.scorein button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--chip);color:var(--ink);font-size:1.1rem;cursor:pointer}
+.scorein b{font-size:1.3rem;min-width:22px;text-align:center}
+.leader{display:flex;gap:10px;margin:10px 0}
+.lcard{flex:1;background:var(--chip);border-radius:12px;padding:12px;text-align:center}
+.lcard b{font-size:1.5rem;display:block}
+.lcard span{font-size:.68rem;color:var(--mut)}
+.empty{text-align:center;color:var(--mut);font-size:.85rem;padding:30px 10px}
+.simbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.simbar i{display:block;height:100%;background:var(--acc)}
+.toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:.8rem;z-index:60;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:.95}
+.src{font-size:.66rem;color:var(--mut);text-align:center;padding:8px 0 16px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div>
+      <h1><span class="dot" id="livedot"></span>WC26 Predictor</h1>
+      <div class="sub" id="lastupd">FIFA World Cup 2026 · Jun 11 – Jul 19</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="iconbtn" id="refreshbtn" title="Refresh scores">⟳</button>
+      <button class="iconbtn" id="darkbtn" title="Theme">◐</button>
+    </div>
+  </div>
+</header>
+
+<div id="view-matches">
+  <div class="chips" id="daychips"></div>
+  <main id="matchlist"></main>
+</div>
+<div id="view-groups" style="display:none">
+  <div class="chips" id="grpmode">
+    <div class="chip on" data-m="actual">Actual table</div>
+    <div class="chip" data-m="proj">AI projected</div>
+  </div>
+  <main id="grouplist"></main>
+</div>
+<div id="view-bracket" style="display:none">
+  <main>
+    <div class="note" style="margin:12px 4px 6px">Tap any team in a knockout tie to pick your winner (orange = your pick). Real results override everything. ◆ = AI prediction.</div>
+    <div style="margin:0 4px 10px;display:flex;gap:8px">
+      <button class="btn sm sec" id="clearbracket">Reset my picks</button>
+    </div>
+    <div class="bracketwrap"><div class="bracket" id="bracket"></div></div>
+  </main>
+</div>
+<div id="view-stats" style="display:none">
+  <main id="statsmain"></main>
+</div>
+<div id="view-game" style="display:none">
+  <main id="gamemain"></main>
+</div>
+<div id="view-more" style="display:none">
+  <main id="moremain"></main>
+</div>
+
+<nav class="tabbar">
+  <button data-v="matches" class="on"><span class="ic">⚽</span>Matches</button>
+  <button data-v="groups"><span class="ic">▤</span>Groups</button>
+  <button data-v="bracket"><span class="ic">🏆</span>Bracket</button>
+  <button data-v="stats"><span class="ic">📊</span>Sim</button>
+  <button data-v="game"><span class="ic">🎯</span>My Game</button>
+  <button data-v="more"><span class="ic">⋯</span>More</button>
+</nav>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ================= DATA (snapshot 10 Jun 2026; live-refreshed in app) ================= */
+const TEAMS = {
+"Mexico":{c:"MEX",f:"🇲🇽",g:"A",r:1860,fr:15,host:"MX"},
+"South Africa":{c:"RSA",f:"🇿🇦",g:"A",r:1735,fr:57},
+"Korea Republic":{c:"KOR",f:"🇰🇷",g:"A",r:1815,fr:22},
+"Czechia":{c:"CZE",f:"🇨🇿",g:"A",r:1795,fr:38},
+"Canada":{c:"CAN",f:"🇨🇦",g:"B",r:1810,fr:30,host:"CA"},
+"Bosnia and Herzegovina":{c:"BIH",f:"🇧🇦",g:"B",r:1760,fr:50},
+"Qatar":{c:"QAT",f:"🇶🇦",g:"B",r:1700,fr:53},
+"Switzerland":{c:"SUI",f:"🇨🇭",g:"B",r:1855,fr:17},
+"Brazil":{c:"BRA",f:"🇧🇷",g:"C",r:2020,fr:6},
+"Haiti":{c:"HAI",f:"🇭🇹",g:"C",r:1605,fr:88},
+"Morocco":{c:"MAR",f:"🇲🇦",g:"C",r:1925,fr:11},
+"Scotland":{c:"SCO",f:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",g:"C",r:1785,fr:36},
+"Australia":{c:"AUS",f:"🇦🇺",g:"D",r:1790,fr:26},
+"Paraguay":{c:"PAR",f:"🇵🇾",g:"D",r:1790,fr:37},
+"Türkiye":{c:"TUR",f:"🇹🇷",g:"D",r:1830,fr:27},
+"USA":{c:"USA",f:"🇺🇸",g:"D",r:1855,fr:16,host:"US"},
+"Curaçao":{c:"CUW",f:"🇨🇼",g:"E",r:1620,fr:82},
+"Ecuador":{c:"ECU",f:"🇪🇨",g:"E",r:1855,fr:23},
+"Germany":{c:"GER",f:"🇩🇪",g:"E",r:1970,fr:9},
+"Côte d'Ivoire":{c:"CIV",f:"🇨🇮",g:"E",r:1795,fr:39},
+"Japan":{c:"JPN",f:"🇯🇵",g:"F",r:1880,fr:18},
+"Netherlands":{c:"NED",f:"🇳🇱",g:"F",r:1990,fr:7},
+"Sweden":{c:"SWE",f:"🇸🇪",g:"F",r:1815,fr:28},
+"Tunisia":{c:"TUN",f:"🇹🇳",g:"F",r:1770,fr:41},
+"Belgium":{c:"BEL",f:"🇧🇪",g:"G",r:1955,fr:8},
+"Egypt":{c:"EGY",f:"🇪🇬",g:"G",r:1790,fr:32},
+"IR Iran":{c:"IRN",f:"🇮🇷",g:"G",r:1820,fr:20},
+"New Zealand":{c:"NZL",f:"🇳🇿",g:"G",r:1635,fr:85},
+"Cabo Verde":{c:"CPV",f:"🇨🇻",g:"H",r:1670,fr:68},
+"Saudi Arabia":{c:"KSA",f:"🇸🇦",g:"H",r:1710,fr:58},
+"Spain":{c:"ESP",f:"🇪🇸",g:"H",r:2080,fr:2},
+"Uruguay":{c:"URU",f:"🇺🇾",g:"H",r:1895,fr:14},
+"France":{c:"FRA",f:"🇫🇷",g:"I",r:2090,fr:1},
+"Iraq":{c:"IRQ",f:"🇮🇶",g:"I",r:1665,fr:65},
+"Norway":{c:"NOR",f:"🇳🇴",g:"I",r:1875,fr:25},
+"Senegal":{c:"SEN",f:"🇸🇳",g:"I",r:1850,fr:19},
+"Algeria":{c:"ALG",f:"🇩🇿",g:"J",r:1800,fr:35},
+"Argentina":{c:"ARG",f:"🇦🇷",g:"J",r:2070,fr:3},
+"Austria":{c:"AUT",f:"🇦🇹",g:"J",r:1845,fr:24},
+"Jordan":{c:"JOR",f:"🇯🇴",g:"J",r:1680,fr:62},
+"Colombia":{c:"COL",f:"🇨🇴",g:"K",r:1910,fr:13},
+"Congo DR":{c:"COD",f:"🇨🇩",g:"K",r:1715,fr:56},
+"Portugal":{c:"POR",f:"🇵🇹",g:"K",r:2030,fr:5},
+"Uzbekistan":{c:"UZB",f:"🇺🇿",g:"K",r:1705,fr:55},
+"Croatia":{c:"CRO",f:"🇭🇷",g:"L",r:1930,fr:10},
+"England":{c:"ENG",f:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",g:"L",r:2040,fr:4},
+"Ghana":{c:"GHA",f:"🇬🇭",g:"L",r:1760,fr:48},
+"Panama":{c:"PAN",f:"🇵🇦",g:"L",r:1730,fr:44}
+};
+const ALIASES = {"South Korea":"Korea Republic","Korea, South":"Korea Republic","Iran":"IR Iran","Ivory Coast":"Côte d'Ivoire","Cape Verde":"Cabo Verde","Cape Verde Islands":"Cabo Verde","United States":"USA","Bosnia-Herzegovina":"Bosnia and Herzegovina","Bosnia":"Bosnia and Herzegovina","Czech Republic":"Czechia","Turkey":"Türkiye","DR Congo":"Congo DR","Congo":"Congo DR","Curacao":"Curaçao","Cote d'Ivoire":"Côte d'Ivoire"};
+const VENUE_CC = {"Mexico City Stadium":"MX","Guadalajara Stadium":"MX","Monterrey Stadium":"MX","Toronto Stadium":"CA","BC Place Vancouver":"CA"}; // others = US
+// [no, dateUTC, venue, home, away, group]
+const GFX = [
+[1,"2026-06-11T19:00Z","Mexico City Stadium","Mexico","South Africa","A"],
+[2,"2026-06-12T02:00Z","Guadalajara Stadium","Korea Republic","Czechia","A"],
+[3,"2026-06-12T19:00Z","Toronto Stadium","Canada","Bosnia and Herzegovina","B"],
+[4,"2026-06-13T01:00Z","Los Angeles Stadium","USA","Paraguay","D"],
+[8,"2026-06-13T19:00Z","San Francisco Bay Area Stadium","Qatar","Switzerland","B"],
+[7,"2026-06-13T22:00Z","New York/New Jersey Stadium","Brazil","Morocco","C"],
+[5,"2026-06-14T01:00Z","Boston Stadium","Haiti","Scotland","C"],
+[6,"2026-06-14T04:00Z","BC Place Vancouver","Australia","Türkiye","D"],
+[10,"2026-06-14T17:00Z","Houston Stadium","Germany","Curaçao","E"],
+[11,"2026-06-14T20:00Z","Dallas Stadium","Netherlands","Japan","F"],
+[9,"2026-06-14T23:00Z","Philadelphia Stadium","Côte d'Ivoire","Ecuador","E"],
+[12,"2026-06-15T02:00Z","Monterrey Stadium","Sweden","Tunisia","F"],
+[14,"2026-06-15T16:00Z","Atlanta Stadium","Spain","Cabo Verde","H"],
+[16,"2026-06-15T19:00Z","Seattle Stadium","Belgium","Egypt","G"],
+[13,"2026-06-15T22:00Z","Miami Stadium","Saudi Arabia","Uruguay","H"],
+[15,"2026-06-16T01:00Z","Los Angeles Stadium","IR Iran","New Zealand","G"],
+[17,"2026-06-16T19:00Z","New York/New Jersey Stadium","France","Senegal","I"],
+[18,"2026-06-16T22:00Z","Boston Stadium","Iraq","Norway","I"],
+[19,"2026-06-17T01:00Z","Kansas City Stadium","Argentina","Algeria","J"],
+[20,"2026-06-17T04:00Z","San Francisco Bay Area Stadium","Austria","Jordan","J"],
+[23,"2026-06-17T17:00Z","Houston Stadium","Portugal","Congo DR","K"],
+[22,"2026-06-17T20:00Z","Dallas Stadium","England","Croatia","L"],
+[21,"2026-06-17T23:00Z","Toronto Stadium","Ghana","Panama","L"],
+[24,"2026-06-18T02:00Z","Mexico City Stadium","Uzbekistan","Colombia","K"],
+[25,"2026-06-18T16:00Z","Atlanta Stadium","Czechia","South Africa","A"],
+[26,"2026-06-18T19:00Z","Los Angeles Stadium","Switzerland","Bosnia and Herzegovina","B"],
+[27,"2026-06-18T22:00Z","BC Place Vancouver","Canada","Qatar","B"],
+[28,"2026-06-19T01:00Z","Guadalajara Stadium","Mexico","Korea Republic","A"],
+[32,"2026-06-19T19:00Z","Seattle Stadium","USA","Australia","D"],
+[30,"2026-06-19T22:00Z","Boston Stadium","Scotland","Morocco","C"],
+[29,"2026-06-20T01:00Z","Philadelphia Stadium","Brazil","Haiti","C"],
+[31,"2026-06-20T04:00Z","San Francisco Bay Area Stadium","Türkiye","Paraguay","D"],
+[35,"2026-06-20T17:00Z","Houston Stadium","Netherlands","Sweden","F"],
+[33,"2026-06-20T20:00Z","Toronto Stadium","Germany","Côte d'Ivoire","E"],
+[34,"2026-06-21T00:00Z","Kansas City Stadium","Ecuador","Curaçao","E"],
+[36,"2026-06-21T04:00Z","Monterrey Stadium","Tunisia","Japan","F"],
+[38,"2026-06-21T16:00Z","Atlanta Stadium","Spain","Saudi Arabia","H"],
+[39,"2026-06-21T19:00Z","Los Angeles Stadium","Belgium","IR Iran","G"],
+[37,"2026-06-21T22:00Z","Miami Stadium","Uruguay","Cabo Verde","H"],
+[40,"2026-06-22T01:00Z","BC Place Vancouver","New Zealand","Egypt","G"],
+[43,"2026-06-22T17:00Z","Dallas Stadium","Argentina","Austria","J"],
+[42,"2026-06-22T21:00Z","Philadelphia Stadium","France","Iraq","I"],
+[41,"2026-06-23T00:00Z","New York/New Jersey Stadium","Norway","Senegal","I"],
+[44,"2026-06-23T03:00Z","San Francisco Bay Area Stadium","Jordan","Algeria","J"],
+[47,"2026-06-23T17:00Z","Houston Stadium","Portugal","Uzbekistan","K"],
+[45,"2026-06-23T20:00Z","Boston Stadium","England","Ghana","L"],
+[46,"2026-06-23T23:00Z","Toronto Stadium","Panama","Croatia","L"],
+[48,"2026-06-24T02:00Z","Guadalajara Stadium","Colombia","Congo DR","K"],
+[51,"2026-06-24T19:00Z","BC Place Vancouver","Switzerland","Canada","B"],
+[52,"2026-06-24T19:00Z","Seattle Stadium","Bosnia and Herzegovina","Qatar","B"],
+[49,"2026-06-24T22:00Z","Miami Stadium","Scotland","Brazil","C"],
+[50,"2026-06-24T22:00Z","Atlanta Stadium","Morocco","Haiti","C"],
+[53,"2026-06-25T01:00Z","Mexico City Stadium","Czechia","Mexico","A"],
+[54,"2026-06-25T01:00Z","Monterrey Stadium","South Africa","Korea Republic","A"],
+[55,"2026-06-25T20:00Z","Philadelphia Stadium","Curaçao","Côte d'Ivoire","E"],
+[56,"2026-06-25T20:00Z","New York/New Jersey Stadium","Ecuador","Germany","E"],
+[57,"2026-06-25T23:00Z","Dallas Stadium","Japan","Sweden","F"],
+[58,"2026-06-25T23:00Z","Kansas City Stadium","Tunisia","Netherlands","F"],
+[59,"2026-06-26T02:00Z","Los Angeles Stadium","Türkiye","USA","D"],
+[60,"2026-06-26T02:00Z","San Francisco Bay Area Stadium","Paraguay","Australia","D"],
+[61,"2026-06-26T19:00Z","Boston Stadium","Norway","France","I"],
+[62,"2026-06-26T19:00Z","Toronto Stadium","Senegal","Iraq","I"],
+[65,"2026-06-27T00:00Z","Houston Stadium","Cabo Verde","Saudi Arabia","H"],
+[66,"2026-06-27T00:00Z","Guadalajara Stadium","Uruguay","Spain","H"],
+[63,"2026-06-27T03:00Z","Seattle Stadium","Egypt","IR Iran","G"],
+[64,"2026-06-27T03:00Z","BC Place Vancouver","New Zealand","Belgium","G"],
+[67,"2026-06-27T21:00Z","New York/New Jersey Stadium","Panama","England","L"],
+[68,"2026-06-27T21:00Z","Philadelphia Stadium","Croatia","Ghana","L"],
+[71,"2026-06-27T23:30Z","Miami Stadium","Colombia","Portugal","K"],
+[72,"2026-06-27T23:30Z","Atlanta Stadium","Congo DR","Uzbekistan","K"],
+[69,"2026-06-28T02:00Z","Kansas City Stadium","Algeria","Austria","J"],
+[70,"2026-06-28T02:00Z","Dallas Stadium","Jordan","Argentina","J"]
+];
+// Knockout: [no, dateUTC, venue, homeSlot, awaySlot]  (W1A = group A winner, R2A = runner-up, T:ABCDF = best 3rd from those groups, M73 = winner of match 73)
+const KFX = [
+[73,"2026-06-28T19:00Z","Los Angeles Stadium","R2A","R2B"],
+[74,"2026-06-29T20:30Z","Boston Stadium","W1E","T:ABCDF"],
+[75,"2026-06-30T01:00Z","Monterrey Stadium","W1F","R2C"],
+[76,"2026-06-29T17:00Z","Houston Stadium","W1C","R2F"],
+[77,"2026-06-30T21:00Z","New York/New Jersey Stadium","W1I","T:CDFGH"],
+[78,"2026-06-30T17:00Z","Dallas Stadium","R2E","R2I"],
+[79,"2026-07-01T01:00Z","Mexico City Stadium","W1A","T:CEFHI"],
+[80,"2026-07-01T16:00Z","Atlanta Stadium","W1L","T:EHIJK"],
+[81,"2026-07-02T00:00Z","San Francisco Bay Area Stadium","W1D","T:BEFIJ"],
+[82,"2026-07-01T20:00Z","Seattle Stadium","W1G","T:AEHIJ"],
+[83,"2026-07-02T23:00Z","Toronto Stadium","R2K","R2L"],
+[84,"2026-07-02T19:00Z","Los Angeles Stadium","W1H","R2J"],
+[85,"2026-07-03T03:00Z","BC Place Vancouver","W1B","T:EFGIJ"],
+[86,"2026-07-03T22:00Z","Miami Stadium","W1J","R2H"],
+[87,"2026-07-04T01:30Z","Kansas City Stadium","W1K","T:DEIJL"],
+[88,"2026-07-03T18:00Z","Dallas Stadium","R2D","R2G"],
+[89,"2026-07-04T21:00Z","Philadelphia Stadium","M74","M77"],
+[90,"2026-07-04T17:00Z","Houston Stadium","M73","M75"],
+[91,"2026-07-05T20:00Z","New York/New Jersey Stadium","M76","M78"],
+[92,"2026-07-06T00:00Z","Mexico City Stadium","M79","M80"],
+[93,"2026-07-06T19:00Z","Dallas Stadium","M83","M84"],
+[94,"2026-07-07T00:00Z","Seattle Stadium","M81","M82"],
+[95,"2026-07-07T16:00Z","Atlanta Stadium","M86","M88"],
+[96,"2026-07-07T20:00Z","BC Place Vancouver","M85","M87"],
+[97,"2026-07-09T20:00Z","Boston Stadium","M89","M90"],
+[98,"2026-07-10T19:00Z","Los Angeles Stadium","M93","M94"],
+[99,"2026-07-11T21:00Z","Miami Stadium","M91","M92"],
+[100,"2026-07-12T01:00Z","Kansas City Stadium","M95","M96"],
+[101,"2026-07-14T19:00Z","Dallas Stadium","M97","M98"],
+[102,"2026-07-15T19:00Z","Atlanta Stadium","M99","M100"],
+[103,"2026-07-18T21:00Z","Miami Stadium","L101","L102"],
+[104,"2026-07-19T19:00Z","New York/New Jersey Stadium","M101","M102"]
+];
+const ROUNDNAME = n => n<=72?"Group":n<=88?"Round of 32":n<=96?"Round of 16":n<=100?"Quarter-final":n<=102?"Semi-final":n===103?"3rd place":"FINAL";
+/* ================= STATE ================= */
+const LS = k => { try{ return JSON.parse(localStorage.getItem("wc26_"+k)); }catch(e){ return null; } };
+const SV = (k,v) => localStorage.setItem("wc26_"+k, JSON.stringify(v));
+let state = {
+  results: LS("results") || {},      // matchNo -> {hs,as,status,h,a,min}  (h/a set for knockout once known)
+  picks:   LS("picks")   || {},      // matchNo -> {out:'H'|'D'|'A', hs,as, modelOut, modelHs, modelAs}
+  bracket: LS("bracket") || {},      // matchNo -> winner team name (user pick)
+  news:    LS("news")    || {},      // team -> -100..100 adjustment
+  fdKey:   LS("fdKey")   || "",
+  dark:    LS("dark"),
+  lastFetch: LS("lastFetch") || 0
+};
+if(state.dark === null) state.dark = matchMedia("(prefers-color-scheme: dark)").matches;
+const save = () => { SV("results",state.results); SV("picks",state.picks); SV("bracket",state.bracket); SV("news",state.news); SV("fdKey",state.fdKey); SV("dark",state.dark); SV("lastFetch",state.lastFetch); };
+
+/* ================= ENGINE ================= */
+// Dynamic ratings: base Elo, updated by every finished result (K=40, margin multiplier), plus user news adjustment.
+function liveRatings(extraResults){
+  const R = {}; for(const t in TEAMS) R[t] = TEAMS[t].r;
+  const done = [];
+  for(const fx of GFX){ const r = (extraResults||state.results)[fx[0]]; if(r && r.status==="FT") done.push({d:fx[1],h:fx[3],a:fx[4],hs:r.hs,as:r.as,v:fx[2]}); }
+  for(const fx of KFX){ const r = (extraResults||state.results)[fx[0]]; if(r && r.status==="FT" && r.h && r.a) done.push({d:fx[1],h:r.h,a:r.a,hs:r.hs,as:r.as,v:fx[2]}); }
+  done.sort((x,y)=> x.d<y.d?-1:1);
+  for(const m of done){
+    if(!(m.h in R) || !(m.a in R)) continue;
+    const dh = hostEdge(m.h,m.v), da = hostEdge(m.a,m.v);
+    const we = 1/(1+Math.pow(10,-((R[m.h]+dh)-(R[m.a]+da))/400));
+    const s = m.hs>m.as?1:m.hs===m.as?0.5:0;
+    const gd = Math.abs(m.hs-m.as);
+    const G = gd<=1?1: gd===2?1.5:(11+gd)/8;
+    const delta = 40*G*(s-we);
+    R[m.h]+=delta; R[m.a]-=delta;
+  }
+  return R;
+}
+function hostEdge(team, venue){
+  const cc = VENUE_CC[venue] || "US";
+  return (TEAMS[team] && TEAMS[team].host === cc) ? 45 : 0;
+}
+function effRating(R, team, venue){
+  return R[team] + hostEdge(team,venue) + (state.news[team]||0);
+}
+// Recent form bonus: +12 per win, -12 per loss over a team's completed tournament matches (max ±36)
+function formAdj(team){
+  let f = 0;
+  const all = [...GFX.map(x=>({n:x[0],h:x[3],a:x[4]})), ...KFX.map(x=>({n:x[0]}))];
+  for(const m of all){
+    const r = state.results[m.n]; if(!r || r.status!=="FT") continue;
+    const h = r.h||m.h, a = r.a||m.a;
+    if(h===team) f += r.hs>r.as?12:r.hs<r.as?-12:0;
+    else if(a===team) f += r.as>r.hs?12:r.as<r.hs?-12:0;
+  }
+  return Math.max(-36,Math.min(36,f));
+}
+function matchProbs(R, h, a, venue, knockout){
+  const rh = effRating(R,h,venue)+formAdj(h), ra = effRating(R,a,venue)+formAdj(a);
+  const we = 1/(1+Math.pow(10,-(rh-ra)/400));
+  let pD = knockout?0:Math.max(0.10, 0.29 - Math.abs(we-0.5)*0.38);
+  const pH = we*(1-pD), pA = (1-we)*(1-pD);
+  // Poisson expected goals
+  const total = 2.55, share = 0.32 + 0.36*we + 0.32*Math.pow(we,2)*(we>0.5?0.2:0); // smooth split
+  const xh = Math.max(0.25, total*(0.25+0.75*we)), xa = Math.max(0.25, total*(0.25+0.75*(1-we)));
+  // most likely scoreline
+  let best=[1,1],bp=0;
+  for(let i=0;i<=4;i++)for(let j=0;j<=4;j++){
+    let p = pois(xh,i)*pois(xa,j);
+    if(!knockout){ if((i>j&&pH<pA)||(i<j&&pH>pA)){} }
+    if(p>bp){bp=p;best=[i,j];}
+  }
+  if(knockout && best[0]===best[1]) best = we>=0.5?[best[0]+1,best[1]]:[best[0],best[1]+1];
+  return {pH,pD,pA,we,xh,xa,hs:best[0],as:best[1]};
+}
+function pois(l,k){ let f=1; for(let i=2;i<=k;i++)f*=i; return Math.exp(-l)*Math.pow(l,k)/f; }
+function koWinProb(p){ return p.pH + p.pD*(p.we); } // draws resolved by ET/pens ~ rating
+
+/* ---- Standings ---- */
+function groupMatches(g){ return GFX.filter(x=>x[5]===g); }
+function standings(g, projected, R, resultsOverride){
+  R = R || liveRatings();
+  const res = resultsOverride || state.results;
+  const tbl = {};
+  for(const t in TEAMS) if(TEAMS[t].g===g) tbl[t]={t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+  for(const fx of groupMatches(g)){
+    let r = res[fx[0]];
+    let hs,as;
+    if(r && r.status==="FT"){ hs=r.hs; as=r.as; }
+    else if(projected){ const p = matchProbs(R,fx[3],fx[4],fx[2],false); if(p.pD>=p.pH&&p.pD>=p.pA){hs=1;as=1;} else {hs=p.hs;as=p.as; if(hs===as){ if(p.pH>p.pA)hs++; else as++; }} }
+    else continue;
+    const H=tbl[fx[3]],A=tbl[fx[4]];
+    H.p++;A.p++; H.gf+=hs;H.ga+=as; A.gf+=as;A.ga+=hs;
+    if(hs>as){H.w++;A.l++;H.pts+=3;} else if(hs<as){A.w++;H.l++;A.pts+=3;} else {H.d++;A.d++;H.pts++;A.pts++;}
+  }
+  return Object.values(tbl).sort((x,y)=> y.pts-x.pts || (y.gf-y.ga)-(x.gf-x.ga) || y.gf-x.gf || TEAMS[y.t].r-TEAMS[x.t].r);
+}
+/* ---- Third-place allocation (backtracking over slot constraints) ---- */
+const TSLOTS = {74:"ABCDF",77:"CDFGH",79:"CEFHI",80:"EHIJK",81:"BEFIJ",82:"AEHIJ",85:"EFGIJ",87:"DEIJL"};
+function allocateThirds(qualThirds){ // qualThirds: {group:team} for the 8 best thirds
+  const slots = Object.keys(TSLOTS).map(Number);
+  const groups = Object.keys(qualThirds);
+  const assign = {};
+  function bt(i, used){
+    if(i===slots.length) return true;
+    const s = slots[i];
+    for(const g of TSLOTS[s]){
+      if(qualThirds[g] && !used.has(g)){ used.add(g); assign[s]=qualThirds[g]; if(bt(i+1,used)) return true; used.delete(g); }
+    }
+    return false;
+  }
+  // order slots by fewest available options for robustness
+  slots.sort((a,b)=>{ const ca=[...TSLOTS[a]].filter(g=>qualThirds[g]).length, cb=[...TSLOTS[b]].filter(g=>qualThirds[g]).length; return ca-cb; });
+  bt(0,new Set());
+  return assign; // matchNo -> team
+}
+/* ---- Resolve knockout slot to a team (actual > projection) ---- */
+function resolveSlots(R, projected, resultsOverride){
+  const res = resultsOverride || state.results;
+  const out = {}; // matchNo -> [home, away] (team names or null)
+  const groupDone = g => groupMatches(g).every(fx => (res[fx[0]]||{}).status==="FT");
+  const st = {}; const ranks = {};
+  for(const g of "ABCDEFGHIJKL"){ st[g] = standings(g, projected, R, resultsOverride); }
+  // thirds
+  const thirds = "ABCDEFGHIJKL".split("").map(g=>({g, row:st[g][2]})).filter(x=>x.row && (projected || groupDone(x.g)));
+  thirds.sort((x,y)=> y.row.pts-x.row.pts || (y.row.gf-y.row.ga)-(x.row.gf-x.row.ga) || y.row.gf-x.row.gf || TEAMS[y.row.t].r-TEAMS[x.row.t].r);
+  const qual = {}; thirds.slice(0,8).forEach(x=> qual[x.g]=x.row.t);
+  const tAssign = (thirds.length>=8) ? allocateThirds(qual) : {};
+  for(const k of KFX){
+    const [no,,,hS,aS] = k;
+    const r = res[no];
+    const get = slot => {
+      if(slot.startsWith("W1")||slot.startsWith("R2")){
+        const g = slot[2], pos = slot[0]==="W"?0:1;
+        if(projected || groupDone(g)) return st[g][pos] ? st[g][pos].t : null;
+        return null;
+      }
+      if(slot.startsWith("T:")) return tAssign[no]||null;
+      if(slot.startsWith("M")||slot.startsWith("L")){
+        const src = +slot.slice(1); const rr = res[src];
+        const want = slot[0]==="M" ? "w":"l";
+        if(rr && rr.status==="FT" && rr.h && rr.a){
+          const w = rr.hs>rr.as?rr.h:rr.hs<rr.as?rr.a:(rr.pw||null); // pw = penalty winner if known
+          if(w) return want==="w" ? w : (w===rr.h?rr.a:rr.h);
+        }
+        // projection / user bracket
+        const proj = out[src]; if(!proj || !proj[0] || !proj[1]) return null;
+        const ub = state.bracket[src];
+        let w;
+        if(ub && (ub===proj[0]||ub===proj[1])) w = ub;
+        else { const p = matchProbs(R,proj[0],proj[1],KFX.find(x=>x[0]===src)[2],true); w = koWinProb(p)>=0.5?proj[0]:proj[1]; }
+        return want==="w"? w : (w===proj[0]?proj[1]:proj[0]);
+      }
+      return null;
+    };
+    // actual announced teams from live feed take priority
+    out[no] = [ (r&&r.h)||get(hS), (r&&r.a)||get(aS) ];
+  }
+  return out;
+}
+/* ---- Monte Carlo tournament simulation ---- */
+function simulate(n){
+  const tally = {}; for(const t in TEAMS) tally[t]={r32:0,r16:0,qf:0,sf:0,fin:0,champ:0};
+  const baseR = liveRatings();
+  for(let it=0; it<n; it++){
+    const res = {};
+    // copy actual finished
+    for(const k in state.results) res[k]=state.results[k];
+    // group stage sample
+    for(const fx of GFX){
+      if(res[fx[0]] && res[fx[0]].status==="FT") continue;
+      const p = matchProbs(baseR,fx[3],fx[4],fx[2],false);
+      const u = Math.random();
+      let hs,as;
+      if(u<p.pH){ hs=1+samplePlus(p.xh); as=Math.max(0,hs-1-Math.floor(Math.random()*2)); }
+      else if(u<p.pH+p.pD){ hs=as=Math.random()<0.45?1:Math.random()<0.5?0:2; }
+      else { as=1+samplePlus(p.xa); hs=Math.max(0,as-1-Math.floor(Math.random()*2)); }
+      res[fx[0]]={hs,as,status:"FT"};
+    }
+    const slots = resolveSlotsSim(baseR,res);
+    // knockout
+    const reach = {};
+    for(const k of KFX){
+      const [no,,v] = k;
+      let h=slots[no][0], a=slots[no][1];
+      if(!h||!a) continue;
+      if(no<=88){ tally[h].r32++; tally[a].r32++; }
+      let w;
+      const r = res[no];
+      if(r && r.status==="FT" && r.h && r.a){ w = r.hs>r.as?r.h:r.hs<r.as?r.a:(r.pw|| (Math.random()<0.5?r.h:r.a)); }
+      else { const p = matchProbs(baseR,h,a,v,true); w = Math.random()<koWinProb(p)?h:a; }
+      const l = w===h?a:h;
+      // feed into next slots
+      for(const k2 of KFX){ if(k2[3]==="M"+no) slots[k2[0]][0]=w; if(k2[4]==="M"+no) slots[k2[0]][1]=w; if(k2[3]==="L"+no) slots[k2[0]][0]=l; if(k2[4]==="L"+no) slots[k2[0]][1]=l; }
+      if(no>=89&&no<=96){ tally[w].qf=tally[w].qf; tally[h].r16++; tally[a].r16++; }
+      if(no>=97&&no<=100){ tally[h].qf++; tally[a].qf++; }
+      if(no===101||no===102){ tally[h].sf++; tally[a].sf++; }
+      if(no===104){ tally[h].fin++; tally[a].fin++; tally[w].champ++; }
+    }
+  }
+  for(const t in tally) for(const k in tally[t]) tally[t][k] = tally[t][k]/n*100;
+  return tally;
+}
+function samplePlus(x){ const u=Math.random(); return u<0.55?0:u<0.85?1:2; }
+function resolveSlotsSim(R,res){
+  const st={}; for(const g of "ABCDEFGHIJKL") st[g]=standings(g,false,R,res);
+  const thirds="ABCDEFGHIJKL".split("").map(g=>({g,row:st[g][2]}));
+  thirds.sort((x,y)=> y.row.pts-x.row.pts || (y.row.gf-y.row.ga)-(x.row.gf-x.row.ga) || y.row.gf-x.row.gf || Math.random()-0.5);
+  const qual={}; thirds.slice(0,8).forEach(x=>qual[x.g]=x.row.t);
+  const tA = allocateThirds(qual);
+  const out={};
+  for(const k of KFX){
+    const [no,,,hS,aS]=k;
+    const get = s => s.startsWith("W1")?st[s[2]][0].t : s.startsWith("R2")?st[s[2]][1].t : s.startsWith("T:")?(tA[no]||null) : null;
+    out[no]=[get(hS),get(aS)];
+  }
+  return out;
+}
+/* ================= RENDER ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtT = d => new Date(d).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const fmtD = d => new Date(d).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
+const dayKey = d => { const x=new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
+const todayKey = () => dayKey(Date.now());
+const TF = t => TEAMS[t] ? TEAMS[t].f : "▫️";
+const TN = t => t || "TBD";
+let curDay = null, grpProj = false, simCache = null, curView = "matches";
+
+function allFixtures(){
+  const R = liveRatings();
+  const slots = resolveSlots(R, true);
+  const list = [];
+  for(const fx of GFX) list.push({no:fx[0],d:fx[1],v:fx[2],h:fx[3],a:fx[4],g:fx[5],ko:false});
+  for(const k of KFX){
+    const r = state.results[k[0]]||{};
+    const [h,a] = [(r.h)||slots[k[0]][0], (r.a)||slots[k[0]][1]];
+    list.push({no:k[0],d:k[1],v:k[2],h,a,hS:k[3],aS:k[4],ko:true,projected: !(r.h&&r.a)});
+  }
+  list.sort((x,y)=> x.d<y.d?-1:1);
+  return {list,R};
+}
+function matchStatus(m){
+  const r = state.results[m.no];
+  if(r && r.status==="FT") return {s:"FT",hs:r.hs,as:r.as};
+  if(r && r.status==="LIVE") return {s:"LIVE",hs:r.hs,as:r.as,min:r.min};
+  const start = new Date(m.d).getTime();
+  if(Date.now()>start && Date.now()<start+130*60000 && m.h && m.a && !m.projected) return {s:"LIVE?",hs:r?r.hs:null,as:r?r.as:null};
+  return {s:"UP"};
+}
+function renderDays(){
+  const days = [...new Set(allFixtures().list.map(m=>dayKey(m.d)))];
+  if(!curDay) curDay = days.includes(todayKey()) ? todayKey() : days[0];
+  $("#daychips").innerHTML = days.map(d=>{
+    const lbl = d===todayKey() ? "Today" : new Date(d+"T12:00").toLocaleDateString([],{month:"short",day:"numeric"});
+    return `<div class="chip ${d===curDay?"on":""}" data-d="${d}">${lbl}</div>`;
+  }).join("");
+  $("#daychips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{curDay=c.dataset.d;renderMatches();});
+}
+function renderMatches(){
+  renderDays();
+  const {list,R} = allFixtures();
+  const todays = list.filter(m=>dayKey(m.d)===curDay);
+  if(!todays.length){ $("#matchlist").innerHTML = `<div class="empty">No matches this day.</div>`; return; }
+  let html = `<div class="datehead">${fmtD(todays[0].d)} · ${todays.length} matches</div><div class="card">`;
+  for(const m of todays){
+    const st = matchStatus(m);
+    const p = (m.h&&m.a) ? matchProbs(R,m.h,m.a,m.v,m.ko) : null;
+    const pick = state.picks[m.no];
+    let mid;
+    if(st.s==="FT") mid = `<div class="score">${st.hs} – ${st.as}<span class="tm">FT</span></div>`;
+    else if(st.s==="LIVE") mid = `<div class="score live">${st.hs??0} – ${st.as??0}<span class="tm">${st.min||"LIVE"}'</span></div>`;
+    else if(st.s==="LIVE?") mid = `<div class="score live">${st.hs??"–"} ${st.hs!=null?"–":""} ${st.as??""}<span class="tm">In play</span></div>`;
+    else mid = `<div class="score">${p?esc(p.hs+" : "+p.as):"vs"}<span class="tm">${fmtT(m.d)}</span></div>`;
+    html += `<div class="match" data-no="${m.no}">
+      <div class="mtop"><span>${ROUNDNAME(m.no)}${m.g?" "+m.g:""} · M${m.no}</span>
+      <span>${st.s==="LIVE"||st.s==="LIVE?"?'<span class="badge live">LIVE</span>':st.s==="FT"?'<span class="badge ft">FT</span>':pick?'<span class="badge pick">PICKED</span>':""} ${esc(m.v.replace(" Stadium",""))}</span></div>
+      <div class="mrow">
+        <div class="team"><span class="flag">${TF(m.h)}</span><span class="nm">${esc(TN(m.h))}</span></div>
+        ${mid}
+        <div class="team right"><span class="nm">${esc(TN(m.a))}</span><span class="flag">${TF(m.a)}</span></div>
+      </div>
+      ${p&&st.s!=="FT"?`<div class="pbar"><i class="h" style="width:${p.pH*100}%"></i><i class="d" style="width:${p.pD*100}%"></i><i class="a" style="width:${p.pA*100}%"></i></div>
+      <div class="plabels"><span>${Math.round(p.pH*100)}%</span>${m.ko?"":`<span>draw ${Math.round(p.pD*100)}%</span>`}<span>${Math.round(p.pA*100)}%</span></div>`:""}
+    </div>`;
+  }
+  html += `</div><div class="src">Predictions update automatically as results & news come in · AI model: live Elo + form + host edge + your news adjustments</div>`;
+  $("#matchlist").innerHTML = html;
+  $("#matchlist").querySelectorAll(".match").forEach(el=>el.onclick=()=>openMatch(+el.dataset.no));
+}
+function renderGroups(){
+  const R = liveRatings();
+  let html = "";
+  for(const g of "ABCDEFGHIJKL"){
+    const st = standings(g, grpProj, R);
+    html += `<div class="card"><div class="grouphead">Group ${g}<span class="badge">${grpProj?"AI projected":"live"}</span></div>
+    <table><tr><th style="text-align:left">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>`;
+    st.forEach((r,i)=>{
+      html += `<tr class="${i<2?"q1":i===2?"q3":""}"><td class="tn" data-t="${esc(r.t)}">${TF(r.t)} ${esc(r.t)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga>0?"+":""}${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`;
+    });
+    html += `</table></div>`;
+  }
+  html += `<div class="src">Green = top two qualify · Amber = third place (best 8 of 12 advance)</div>`;
+  $("#grouplist").innerHTML = html;
+  $("#grouplist").querySelectorAll("td.tn").forEach(td=>td.onclick=()=>openTeam(td.dataset.t));
+}
+function renderBracket(){
+  const R = liveRatings();
+  const slots = resolveSlots(R, true);
+  const cols = [
+    {t:"Round of 32",ms:KFX.filter(k=>k[0]<=88)},
+    {t:"Round of 16",ms:KFX.filter(k=>k[0]>=89&&k[0]<=96)},
+    {t:"Quarter-finals",ms:KFX.filter(k=>k[0]>=97&&k[0]<=100)},
+    {t:"Semi-finals",ms:KFX.filter(k=>k[0]===101||k[0]===102)},
+    {t:"Final",ms:KFX.filter(k=>k[0]>=103)}
+  ];
+  const winnerOf = no => {
+    const r = state.results[no];
+    const pair = slots[no];
+    if(r && r.status==="FT" && r.h && r.a) return r.hs>r.as?r.h:r.hs<r.as?r.a:(r.pw||null);
+    if(state.bracket[no] && pair && (state.bracket[no]===pair[0]||state.bracket[no]===pair[1])) return state.bracket[no];
+    if(pair && pair[0] && pair[1]){ const k=KFX.find(x=>x[0]===no); const p=matchProbs(R,pair[0],pair[1],k[2],true); return koWinProb(p)>=0.5?pair[0]:pair[1]; }
+    return null;
+  };
+  let html = "";
+  for(const col of cols){
+    html += `<div class="bcol"><h4>${col.t}</h4>`;
+    for(const k of col.ms){
+      const no=k[0], pair=slots[no]||[null,null], w=winnerOf(no);
+      const r = state.results[no];
+      const isUser = state.bracket[no] && !(r&&r.status==="FT");
+      const isAI = !isUser && !(r&&r.status==="FT");
+      const side=(t,sl)=>{
+        const cls = (w&&t===w)?"bt w":"bt";
+        const lbl = t?`${TF(t)} <span class="nm">${esc(t)}</span>`:`<span class="nm" style="color:var(--mut)">${esc(slotLabel(sl))}</span>`;
+        const sc = (r&&r.status==="FT")? `<b>${t===((r.h)||pair[0])?r.hs:r.as}</b>`:"";
+        return `<div class="${cls}" data-no="${no}" data-t="${esc(t||"")}">${lbl}${sc}</div>`;
+      };
+      html += `<div class="bm">${side(pair[0],k[3])}${side(pair[1],k[4])}
+        <div class="meta">M${no} · ${fmtD(k[1])} · ${esc(k[2].replace(" Stadium",""))} ${r&&r.status==="FT"?"· FT":isUser?"· 🟠 your pick":w?"· ◆ AI":""}</div></div>`;
+    }
+    html += `</div>`;
+  }
+  $("#bracket").innerHTML = html;
+  $("#bracket").querySelectorAll(".bt").forEach(el=>{
+    el.onclick=()=>{
+      const no=+el.dataset.no, t=el.dataset.t;
+      if(!t) return;
+      const r=state.results[no]; if(r&&r.status==="FT") return openTeam(t);
+      state.bracket[no] = (state.bracket[no]===t)? undefined : t;
+      if(state.bracket[no]===undefined) delete state.bracket[no];
+      save(); renderBracket();
+    };
+  });
+}
+function slotLabel(sl){
+  if(!sl) return "TBD";
+  if(sl.startsWith("W1")) return "Winner Grp "+sl[2];
+  if(sl.startsWith("R2")) return "Runner-up "+sl[2];
+  if(sl.startsWith("T:")) return "3rd: "+sl.slice(2).split("").join("/");
+  if(sl.startsWith("M")) return "Winner M"+sl.slice(1);
+  if(sl.startsWith("L")) return "Loser M"+sl.slice(1);
+  return sl;
+}
+function renderStats(){
+  let html = `<div class="card" style="padding:14px">
+    <h3 style="font-size:.95rem">🎲 Tournament simulator</h3>
+    <div class="note">Runs the whole remaining tournament 2,000 times with the live model (updated ratings, form, your news adjustments). Re-run any time — odds shift as real results arrive.</div>
+    <button class="btn" id="runsim">${simCache?"Re-run":"Run"} 2,000 simulations</button>
+  </div>`;
+  if(simCache){
+    const rows = Object.entries(simCache).map(([t,v])=>({t,...v})).sort((a,b)=>b.champ-a.champ).slice(0,20);
+    const mx = rows[0].champ||1;
+    html += `<div class="card"><div class="grouphead">🏆 Win the World Cup</div><table>
+    <tr><th style="text-align:left">Team</th><th>Champ</th><th>Final</th><th>Semis</th><th></th></tr>`;
+    for(const r of rows){
+      html += `<tr><td class="tn" data-t="${esc(r.t)}">${TF(r.t)} ${esc(r.t)}</td>
+      <td><b>${r.champ.toFixed(1)}%</b></td><td>${r.fin.toFixed(1)}%</td><td>${r.sf.toFixed(1)}%</td>
+      <td style="width:30%"><div class="simbar"><i style="width:${r.champ/mx*100}%"></i></div></td></tr>`;
+    }
+    html += `</table></div>`;
+  }
+  html += `<div class="card" style="padding:14px"><h3 style="font-size:.95rem">⚡ Power rankings (live model)</h3>
+  <div class="note">Base rating ± live Elo updates from every result ± your news adjustments.</div><table><tr><th style="text-align:left">Team</th><th>Rating</th><th>Δ news</th><th>Form</th></tr>`;
+  const R = liveRatings();
+  Object.keys(TEAMS).map(t=>({t,r:R[t]+(state.news[t]||0)})).sort((a,b)=>b.r-a.r).slice(0,15).forEach((x,i)=>{
+    const na = state.news[x.t]||0, fa = formAdj(x.t);
+    html += `<tr><td class="tn" data-t="${esc(x.t)}">${i+1}. ${TF(x.t)} ${esc(x.t)}</td><td><b>${Math.round(x.r)}</b></td><td>${na? (na>0?"+":"")+na : "–"}</td><td>${fa? (fa>0?"+":"")+fa : "–"}</td></tr>`;
+  });
+  html += `</table></div>`;
+  $("#statsmain").innerHTML = html;
+  $("#runsim").onclick = () => { $("#runsim").textContent="Simulating…"; setTimeout(()=>{ simCache=simulate(2000); renderStats(); toast("2,000 tournaments simulated"); },30); };
+  $("#statsmain").querySelectorAll("td.tn").forEach(td=>td.onclick=()=>openTeam(td.dataset.t));
+}
+function renderGame(){
+  let pts=0, mPts=0, n=0, exact=0, mExact=0;
+  for(const no in state.picks){
+    const r = state.results[no]; if(!r||r.status!=="FT") continue;
+    const pk = state.picks[no]; n++;
+    const out = r.hs>r.as?"H":r.hs<r.as?"A":"D";
+    if(pk.out===out){ pts+=1; }
+    if(pk.hs===r.hs && pk.as===r.as){ pts+=2; exact++; }
+    if(pk.modelOut===out){ mPts+=1; }
+    if(pk.modelHs===r.hs && pk.modelAs===r.as){ mPts+=2; mExact++; }
+  }
+  let html = `<div class="card" style="padding:14px">
+    <h3 style="font-size:.95rem">🎯 You vs The Model</h3>
+    <div class="note">Pick results before kick-off (open any upcoming match). 1 pt correct outcome, +2 pts exact score. The AI locks its prediction the moment you pick — beat it!</div>
+    <div class="leader">
+      <div class="lcard"><b>${pts}</b><span>YOU · ${exact} exact</span></div>
+      <div class="lcard"><b>${mPts}</b><span>AI MODEL · ${mExact} exact</span></div>
+    </div>
+    <div class="note" style="text-align:center">${n} scored matches · ${Object.keys(state.picks).length-n} picks pending</div>
+  </div>`;
+  const upcoming = Object.entries(state.picks).filter(([no])=>!(state.results[no]&&state.results[no].status==="FT"));
+  const scored = Object.entries(state.picks).filter(([no])=>state.results[no]&&state.results[no].status==="FT");
+  const line = (no,pk)=>{
+    const m = allFixtures().list.find(x=>x.no==no); if(!m) return "";
+    const r = state.results[no];
+    const res = r&&r.status==="FT" ? ` → ${r.hs}-${r.as}` : "";
+    const out = r&&r.status==="FT" ? (r.hs>r.as?"H":r.hs<r.as?"A":"D") : null;
+    const ok = out? (pk.out===out ? (pk.hs===r.hs&&pk.as===r.as?"✅✅":"✅") : "❌") : "";
+    return `<div class="row" data-no="${no}" style="cursor:pointer"><span>${TF(m.h)} ${esc(TN(m.h))} v ${esc(TN(m.a))} ${TF(m.a)}</span><span>You: ${pk.hs}-${pk.as}${res} ${ok}</span></div>`;
+  };
+  if(upcoming.length){ html += `<div class="card" style="padding:8px 14px"><div class="grouphead" style="padding:8px 0">Pending picks</div>${upcoming.map(([no,pk])=>line(no,pk)).join("")}</div>`; }
+  if(scored.length){ html += `<div class="card" style="padding:8px 14px"><div class="grouphead" style="padding:8px 0">Scored</div>${scored.map(([no,pk])=>line(no,pk)).join("")}</div>`; }
+  if(!upcoming.length&&!scored.length) html += `<div class="empty">No picks yet — open any upcoming match from the Matches tab and lock in your prediction.</div>`;
+  $("#gamemain").innerHTML = html;
+  $("#gamemain").querySelectorAll(".row[data-no]").forEach(el=>el.onclick=()=>openMatch(+el.dataset.no));
+}
+function renderMore(){
+  $("#moremain").innerHTML = `
+  <div class="card" style="padding:14px">
+    <h3>⚙️ Live data — 3 free sources, best one wins</h3>
+    <div class="note">① <b>ESPN public scoreboard</b> — minute-by-minute live scores, automatic, no key.<br>② <b>fixturedownload.com feed</b> — full schedule, confirmed results, knockout matchups.<br>③ <b>football-data.org</b> (optional free key below) — extra backup incl. penalty-shootout winners.<br>Freshest source wins; finished results are never downgraded.</div>
+    <input type="password" id="fdkey" placeholder="football-data.org API token (optional)" value="${esc(state.fdKey)}">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn sm" id="savekey">Save key</button>
+      <button class="btn sm sec" id="refresh2">Refresh scores now</button>
+    </div>
+    <div class="note" id="fetchstat">Last update: ${state.lastFetch?new Date(state.lastFetch).toLocaleString():"never"}</div>
+  </div>
+  <div class="card" style="padding:14px">
+    <h3>📰 News & injuries</h3>
+    <div class="note">Open any team and tap <b>🔎 Scan latest news</b> — the app pulls live Google News headlines, flags injury/availability signals (🔻/🔺) and suggests a rating adjustment you can apply with one tap, or fine-tune with the slider. Predictions, projections and simulations update instantly everywhere.</div>
+  </div>
+  <div class="card" style="padding:14px">
+    <h3>🧠 How the prediction algorithm works</h3>
+    <div class="note">
+    1. Every team starts at a base strength rating calibrated to FIFA rankings (Jun 2026).<br>
+    2. After every real result, ratings update live via Elo (K=40, boosted for big wins).<br>
+    3. Tournament form adds up to ±36 pts; hosts get +45 in their own country.<br>
+    4. Your news adjustments add ±100.<br>
+    5. Win/draw/loss probabilities come from the rating gap; scorelines from a Poisson goal model.<br>
+    6. The simulator plays the remaining tournament 2,000×, handling group tiebreakers, best-8 third-place qualification (with FIFA's slot constraints) and the full bracket to the final.</div>
+  </div>
+  <div class="card" style="padding:14px">
+    <h3>🛠 Manual score entry</h3>
+    <div class="note">Feed lagging? Open any live/finished match and enter the score yourself — the model treats it as real.</div>
+    <button class="btn sm sec" id="resetall">Reset ALL app data</button>
+  </div>
+  <div class="src">Unofficial fan app · fixtures: fixturedownload.com · not affiliated with FIFA</div>`;
+  $("#savekey").onclick=()=>{ state.fdKey=$("#fdkey").value.trim(); save(); toast("Key saved"); refreshScores(true); };
+  $("#refresh2").onclick=()=>refreshScores(true);
+  $("#resetall").onclick=()=>{ if(confirm("Wipe picks, bracket, news tweaks and cached scores?")){ localStorage.clear(); location.reload(); } };
+}
+/* ---- Match sheet ---- */
+function openMatch(no){
+  const {list,R} = allFixtures();
+  const m = list.find(x=>x.no===no); if(!m) return;
+  const st = matchStatus(m);
+  const p = (m.h&&m.a)?matchProbs(R,m.h,m.a,m.v,m.ko):null;
+  const r = state.results[no]||{};
+  const pk = state.picks[no];
+  const editable = st.s!=="FT" && m.h && m.a && !m.projected;
+  const canPick = st.s==="UP" && m.h && m.a;
+  let html = `<div class="grab"></div>
+  <div class="mtop"><span>${ROUNDNAME(no)}${m.g?" "+m.g:""} · Match ${no}</span><span>${fmtD(m.d)} ${fmtT(m.d)}</span></div>
+  <div class="mrow" style="margin:8px 0">
+    <div class="team" data-t="${esc(m.h||"")}"><span class="flag" style="font-size:2rem">${TF(m.h)}</span><span class="nm">${esc(TN(m.h))}</span></div>
+    <div class="score" style="font-size:1.4rem">${st.s==="FT"||st.s==="LIVE"?`${st.hs??0} – ${st.as??0}`:"vs"}</div>
+    <div class="team right" data-t="${esc(m.a||"")}"><span class="nm">${esc(TN(m.a))}</span><span class="flag" style="font-size:2rem">${TF(m.a)}</span></div>
+  </div>
+  <div class="note" style="text-align:center">${esc(m.v)} · ${VENUE_CC[m.v]==="MX"?"🇲🇽 Mexico":VENUE_CC[m.v]==="CA"?"🇨🇦 Canada":"🇺🇸 USA"}</div>`;
+  if(p){
+    html += `<h3 style="margin-top:12px">AI prediction ${st.s==="FT"?"(pre-match)":""}</h3>
+    <div class="pbar" style="height:10px"><i class="h" style="width:${p.pH*100}%"></i><i class="d" style="width:${p.pD*100}%"></i><i class="a" style="width:${p.pA*100}%"></i></div>
+    <div class="plabels"><span>${esc(TEAMS[m.h]?.c||m.h)} ${Math.round(p.pH*100)}%</span>${m.ko?"":`<span>Draw ${Math.round(p.pD*100)}%</span>`}<span>${esc(TEAMS[m.a]?.c||m.a)} ${Math.round(p.pA*100)}%</span></div>
+    <div class="statgrid">
+      <div class="stat"><b>${p.hs} : ${p.as}</b><span>likely score</span></div>
+      <div class="stat"><b>${p.xh.toFixed(1)} / ${p.xa.toFixed(1)}</b><span>exp. goals</span></div>
+      <div class="stat"><b>${Math.round(Math.max(p.pH,p.pD,p.pA)*100)}%</b><span>confidence</span></div>
+    </div>`;
+  }
+  if(canPick){
+    const cur = pk||{out:p.pH>=p.pA?"H":"A",hs:p?p.hs:1,as:p?p.as:1};
+    html += `<h3>🎯 Your prediction</h3>
+    <div class="seg" id="outseg">
+      <button data-o="H" class="${cur.out==="H"?"on":""}">${esc(TEAMS[m.h]?.c||"Home")} win</button>
+      ${m.ko?"":`<button data-o="D" class="${cur.out==="D"?"on":""}">Draw</button>`}
+      <button data-o="A" class="${cur.out==="A"?"on":""}">${esc(TEAMS[m.a]?.c||"Away")} win</button>
+    </div>
+    <div class="scorein">
+      <div class="stp"><button id="hm">−</button><b id="hv">${cur.hs}</b><button id="hp">+</button></div>
+      <span style="color:var(--mut)">:</span>
+      <div class="stp"><button id="am">−</button><b id="av">${cur.as}</b><button id="ap">+</button></div>
+    </div>
+    <button class="btn" id="lockpick" style="width:100%">${pk?"Update pick":"Lock in my pick"} 🔒</button>
+    ${pk?`<div class="note" style="text-align:center">AI locked: ${pk.modelHs}-${pk.modelAs} (${pk.modelOut==="H"?TN(m.h):pk.modelOut==="A"?TN(m.a):"Draw"})</div>`:""}`;
+  }
+  if(editable){
+    html += `<h3 style="margin-top:14px">✍️ Enter real score ${st.s==="UP"?"(if feed is behind)":""}</h3>
+    <div class="scorein">
+      <div class="stp"><button id="rhm">−</button><b id="rhv">${r.hs??0}</b><button id="rhp">+</button></div>
+      <span style="color:var(--mut)">:</span>
+      <div class="stp"><button id="ram">−</button><b id="rav">${r.as??0}</b><button id="rap">+</button></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn sec" id="setlive" style="flex:1">Set as LIVE</button>
+      <button class="btn" id="setft" style="flex:1">Final result</button>
+    </div>`;
+  }
+  if(st.s==="FT"){ html += `<div class="note" style="text-align:center;margin-top:10px">Full time. Ratings updated. ${r.manual?'<button class="btn sm sec" id="undores">Undo manual result</button>':""}</div>`; }
+  openSheet(html);
+  $("#sheet").querySelectorAll(".team[data-t]").forEach(el=>{ if(el.dataset.t) el.onclick=()=>openTeam(el.dataset.t); });
+  if(canPick){
+    let out = (pk||{}).out || (p.pH>=p.pA?"H":"A");
+    $("#outseg").querySelectorAll("button").forEach(b=>b.onclick=()=>{ out=b.dataset.o; $("#outseg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); });
+    const step=(id,delta,el)=>{$(id).onclick=()=>{const v=Math.max(0,Math.min(9,+$(el).textContent+delta));$(el).textContent=v;};};
+    step("#hm",-1,"#hv");step("#hp",1,"#hv");step("#am",-1,"#av");step("#ap",1,"#av");
+    $("#lockpick").onclick=()=>{
+      const hs=+$("#hv").textContent, as=+$("#av").textContent;
+      state.picks[no] = {out, hs, as, modelOut: pk?pk.modelOut:(p.pH>=Math.max(p.pD,p.pA)?"H":p.pA>=Math.max(p.pD,p.pH)?"A":"D"), modelHs: pk?pk.modelHs:p.hs, modelAs: pk?pk.modelAs:p.as};
+      save(); closeSheet(); toast("Pick locked — good luck! 🍀"); renderAll();
+    };
+  }
+  if(editable){
+    const step=(id,delta,el)=>{$(id).onclick=()=>{const v=Math.max(0,Math.min(19,+$(el).textContent+delta));$(el).textContent=v;};};
+    step("#rhm",-1,"#rhv");step("#rhp",1,"#rhv");step("#ram",-1,"#rav");step("#rap",1,"#rav");
+    const grab=()=>({hs:+$("#rhv").textContent, as:+$("#rav").textContent, h:m.h, a:m.a, manual:true});
+    $("#setlive").onclick=()=>{ state.results[no]={...grab(),status:"LIVE"}; save(); closeSheet(); renderAll(); };
+    $("#setft").onclick=()=>{ state.results[no]={...grab(),status:"FT"}; save(); closeSheet(); toast("Result saved — model updated ⚡"); simCache=null; renderAll(); };
+  }
+  const u=$("#undores"); if(u) u.onclick=()=>{ delete state.results[no]; save(); closeSheet(); renderAll(); };
+}
+/* ---- Team sheet ---- */
+function openTeam(t){
+  if(!TEAMS[t]) return;
+  const T = TEAMS[t], R = liveRatings();
+  const na = state.news[t]||0, fa = formAdj(t), eloDelta = Math.round(R[t]-T.r);
+  const played = [];
+  for(const fx of GFX){ if(fx[3]===t||fx[4]===t){ const r=state.results[fx[0]]; if(r&&r.status==="FT") played.push(`${fx[3]===t?"":""}${TF(fx[3])} ${r.hs}-${r.as} ${TF(fx[4])}`); } }
+  let html = `<div class="grab"></div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+    <span style="font-size:2.6rem">${T.f}</span>
+    <div><h3>${esc(t)}</h3><div class="note">Group ${T.g} · FIFA rank #${T.fr} ${T.host?"· 🏠 Host nation":""}</div></div>
+  </div>
+  <div class="statgrid">
+    <div class="stat"><b>${Math.round(R[t]+na)}</b><span>live rating</span></div>
+    <div class="stat"><b>${eloDelta>=0?"+":""}${eloDelta}</b><span>Elo since KO</span></div>
+    <div class="stat"><b>${fa>=0?"+":""}${fa}</b><span>form</span></div>
+  </div>
+  ${simCache&&simCache[t]?`<div class="statgrid">
+    <div class="stat"><b>${simCache[t].champ.toFixed(1)}%</b><span>win cup</span></div>
+    <div class="stat"><b>${simCache[t].fin.toFixed(1)}%</b><span>reach final</span></div>
+    <div class="stat"><b>${simCache[t].r32.toFixed(0)}%</b><span>reach KO</span></div>
+  </div>`:`<div class="note">Run the simulator (Sim tab) to see this team's tournament odds.</div>`}
+  ${played.length?`<div class="note"><b>Results:</b> ${played.join(" · ")}</div>`:""}
+  <h3 style="margin-top:10px">📰 News adjustment <span style="float:right;color:${na>0?"var(--acc2)":na<0?"var(--live)":"var(--mut)"}">${na>0?"+":""}${na}</span></h3>
+  <div class="note">Injuries, suspensions, morale — you read the news, the model listens. −100 (crisis) to +100 (unstoppable).</div>
+  <input type="range" id="newsr" min="-100" max="100" step="5" value="${na}">
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn sm" id="scannews">🔎 Scan latest news</button>
+    <a class="btn sm sec" style="text-decoration:none" target="_blank" rel="noopener" href="https://news.google.com/search?q=${encodeURIComponent(t+" World Cup 2026")}">📰 Open news</a>
+    <button class="btn sm sec" id="newsreset">Reset</button>
+  </div>
+  <div id="newsbox"></div>`;
+  openSheet(html);
+  $("#newsr").oninput = e => { state.news[t] = +e.target.value || 0; if(!state.news[t]) delete state.news[t]; save(); simCache=null; };
+  $("#newsr").onchange = () => { renderAll(); openTeam(t); };
+  $("#newsreset").onclick = () => { delete state.news[t]; save(); simCache=null; renderAll(); openTeam(t); };
+  $("#scannews").onclick = async () => {
+    $("#scannews").textContent = "Scanning…"; $("#scannews").disabled = true;
+    const res = await scanNews(t);
+    if(!res || !res.items.length){ $("#newsbox").innerHTML = `<div class="note">Couldn't reach the news feed right now — use the Open news button instead.</div>`; }
+    else {
+      $("#newsbox").innerHTML = `
+      <div class="note" style="margin-top:10px"><b>Headline scan:</b> model suggests <b style="color:${res.suggestion<0?"var(--live)":res.suggestion>0?"var(--acc2)":"var(--mut)"}">${res.suggestion>0?"+":""}${res.suggestion}</b>
+      ${res.suggestion!==(state.news[t]||0)?`<button class="btn sm" id="applysug" style="margin-left:8px">Apply</button>`:""}</div>
+      ${res.items.slice(0,6).map(it=>`<div class="row" style="font-size:.76rem"><a href="${esc(it.link)}" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:none;flex:1">${it.bad?"🔻":it.good?"🔺":"▪️"} ${esc(it.title)}</a></div>`).join("")}
+      <div class="note">🔻 negative signal · 🔺 positive · auto-scored from injury/availability keywords. Review headlines before applying — you're smarter than keywords.</div>`;
+      const ap = $("#applysug");
+      if(ap) ap.onclick = () => { state.news[t] = res.suggestion; if(!state.news[t]) delete state.news[t]; save(); simCache=null; renderAll(); openTeam(t); toast("News adjustment applied"); };
+    }
+    if($("#scannews")){ $("#scannews").textContent = "🔎 Scan latest news"; $("#scannews").disabled = false; }
+  };
+}
+function openSheet(html){ $("#sheet").innerHTML = html; $("#modal").classList.add("open"); }
+function closeSheet(){ $("#modal").classList.remove("open"); }
+$("#modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeSheet(); });
+
+/* ================= LIVE DATA ================= */
+async function fetchJSON(url, opts){
+  try{ const r = await fetch(url, opts); if(!r.ok) throw 0; return await r.json(); }
+  catch(e){
+    try{ const r = await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent(url)); if(!r.ok) throw 0; return await r.json(); }
+    catch(e2){ return null; }
+  }
+}
+async function fetchText(url){
+  try{ const r = await fetch(url); if(!r.ok) throw 0; return await r.text(); }
+  catch(e){
+    try{ const r = await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent(url)); if(!r.ok) throw 0; return await r.text(); }
+    catch(e2){ return null; }
+  }
+}
+const canon = n => { if(!n) return null; n=n.trim(); if(TEAMS[n]) return n; if(ALIASES[n]) return ALIASES[n]; for(const t in TEAMS) if(t.toLowerCase()===n.toLowerCase()) return t; return null; };
+function findMatchNo(h,a,dateISO){
+  for(const fx of GFX) if((fx[3]===h&&fx[4]===a)||(fx[3]===a&&fx[4]===h)) return {no:fx[0], flip:fx[3]!==h};
+  for(const k of KFX){
+    const r = state.results[k[0]];
+    if(r && r.h && r.a && ((r.h===h&&r.a===a)||(r.h===a&&r.a===h))) return {no:k[0], flip:r.h!==h};
+    if(dateISO && Math.abs(new Date(k[1])-new Date(dateISO))<3*36e5 && !(r&&r.h)){ /* KO not yet known here — only date-match if unique below */ }
+  }
+  if(dateISO){
+    const cands = KFX.filter(k=>Math.abs(new Date(k[1])-new Date(dateISO))<90*60000 && !(state.results[k[0]]&&state.results[k[0]].h));
+    if(cands.length===1) return {no:cands[0][0], flip:false, setTeams:true};
+  }
+  return null;
+}
+function mergeResult(no, nv, src){
+  const ex = state.results[no];
+  // manual FT entries only yield to an online FT; manual LIVE yields to any online data
+  if(ex && ex.manual){
+    if(ex.status==="FT" && nv.status!=="FT") return false;
+  }
+  // don't downgrade FT to LIVE
+  if(ex && ex.status==="FT" && !ex.manual && nv.status==="LIVE") return false;
+  if(!ex || ex.hs!==nv.hs || ex.as!==nv.as || ex.status!==nv.status || ex.min!==nv.min || (nv.h&&ex.h!==nv.h)){
+    state.results[no] = {...ex, ...nv, manual:false};
+    return true;
+  }
+  return false;
+}
+/* ESPN public scoreboard — no key, live minute-by-minute */
+async function fetchESPN(){
+  let updated = 0;
+  const days = [new Date(Date.now()-864e5), new Date()].map(d=>d.toISOString().slice(0,10).replace(/-/g,""));
+  for(const d of [...new Set(days)]){
+    const data = await fetchJSON("https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates="+d);
+    if(!data || !data.events) continue;
+    for(const ev of data.events){
+      const comp = (ev.competitions||[])[0]; if(!comp) continue;
+      const home = comp.competitors.find(c=>c.homeAway==="home"), away = comp.competitors.find(c=>c.homeAway==="away");
+      if(!home||!away) continue;
+      const h = canon(home.team.displayName)||canon(home.team.shortDisplayName), a = canon(away.team.displayName)||canon(away.team.shortDisplayName);
+      if(!h||!a) continue;
+      const hit = findMatchNo(h,a,ev.date); if(!hit) continue;
+      const st = ev.status&&ev.status.type?ev.status.type.state:"pre";
+      const hs0 = +home.score||0, as0 = +away.score||0;
+      const hs = hit.flip?as0:hs0, as = hit.flip?hs0:as0;
+      const teams = hit.no>72 ? {h:hit.flip?a:h, a:hit.flip?h:a} : {};
+      if(st==="in"){
+        const min = (ev.status.displayClock||"").replace(/[^0-9+]/g,"");
+        if(mergeResult(hit.no,{hs,as,status:"LIVE",min,...teams},"espn")) updated++;
+      } else if(st==="post"){
+        let pw;
+        if(hs===as){ const w = comp.competitors.find(c=>c.winner); if(w){ const wn = canon(w.team.displayName); if(wn) pw = wn; } }
+        if(mergeResult(hit.no,{hs,as,status:"FT",pw,...teams},"espn")) updated++;
+      } else if(hit.no>72 && teams.h){
+        if(mergeResult(hit.no,{status:"SCHED",...teams},"espn")) updated++;
+      }
+    }
+  }
+  return updated;
+}
+/* Google News RSS scan → suggested news adjustment for a team */
+const NEG_WORDS = ["injur","ruled out","out of","doubt","suspend","ban","sidelin","blow","miss the","misses","strain","hamstring","fracture","surgery","illness","crisis","fitness concern","unavailable","withdraw"];
+const POS_WORDS = ["returns","return to","fit again","boost","cleared","back in training","recovered","available again","full squad","passed fit","in form","unbeaten"];
+async function scanNews(team){
+  const xml = await fetchText("https://news.google.com/rss/search?q="+encodeURIComponent('"'+team+'" World Cup (injury OR squad OR lineup OR team news)')+"&hl=en-US&gl=US&ceid=US:en");
+  if(!xml) return null;
+  let doc; try{ doc = new DOMParser().parseFromString(xml,"text/xml"); }catch(e){ return null; }
+  const items = [...doc.querySelectorAll("item")].slice(0,8).map(it=>({
+    title: (it.querySelector("title")||{}).textContent||"",
+    link: (it.querySelector("link")||{}).textContent||"",
+    date: (it.querySelector("pubDate")||{}).textContent||""
+  })).filter(x=>x.title);
+  let score = 0;
+  for(const it of items){
+    const t = it.title.toLowerCase();
+    for(const w of NEG_WORDS) if(t.includes(w)){ score -= 8; it.bad = true; break; }
+    for(const w of POS_WORDS) if(t.includes(w) && !it.bad){ score += 6; it.good = true; break; }
+  }
+  return {items, suggestion: Math.max(-60, Math.min(40, score))};
+}
+async function refreshScores(manual){
+  $("#refreshbtn").textContent = "…";
+  let updated = 0;
+  // Source 1: fixturedownload feed (full schedule, confirmed results, knockout team names)
+  const feed = await fetchJSON("https://fixturedownload.com/feed/json/fifa-world-cup-2026");
+  if(Array.isArray(feed)){
+    for(const it of feed){
+      const no = it.MatchNumber;
+      const h = canon(it.HomeTeam), a = canon(it.AwayTeam);
+      if(it.HomeTeamScore!=null && it.AwayTeamScore!=null){
+        if(mergeResult(no,{hs:it.HomeTeamScore, as:it.AwayTeamScore, status:"FT", h:h||undefined, a:a||undefined},"feed")) updated++;
+      } else if(no>72 && h && a){
+        const ex = state.results[no]||{};
+        if(ex.h!==h || ex.a!==a){ state.results[no]={...ex, h, a, status:ex.status||"SCHED"}; updated++; }
+      }
+    }
+  }
+  // Source 2: ESPN public scoreboard (no key — live minute-by-minute, today & yesterday)
+  updated += await fetchESPN();
+  // Source 3: football-data.org (optional key — live scores + penalty winners)
+  if(state.fdKey){
+    const fd = await fetchJSON("https://api.football-data.org/v4/competitions/WC/matches",{headers:{"X-Auth-Token":state.fdKey}});
+    if(fd && fd.matches){
+      for(const mm of fd.matches){
+        const h = canon(mm.homeTeam && (mm.homeTeam.name||mm.homeTeam.shortName));
+        const a = canon(mm.awayTeam && (mm.awayTeam.name||mm.awayTeam.shortName));
+        if(!h||!a) continue;
+        // find our match number by teams+date
+        const all=[...GFX.map(x=>({no:x[0],d:x[1],h:x[3],a:x[4]})),...KFX.map(x=>({no:x[0],d:x[1]}))];
+        const cand = all.find(x=> (x.h===h&&x.a===a) || (x.h===a&&x.a===h) || (x.no>72 && Math.abs(new Date(x.d)-new Date(mm.utcDate))<36e5 && state.results[x.no] && ((state.results[x.no].h===h&&state.results[x.no].a===a)||(state.results[x.no].h===a&&state.results[x.no].a===h))));
+        if(!cand) continue;
+        const sc = mm.score||{}; const ft = sc.fullTime||{};
+        const flip = !(GFX.find(g=>g[0]===cand.no && g[3]===h)) && cand.no<=72;
+        if(mm.status==="IN_PLAY"||mm.status==="PAUSED"){
+          if(mergeResult(cand.no,{hs:flip?ft.away??0:ft.home??0, as:flip?ft.home??0:ft.away??0, status:"LIVE", min:mm.minute, h:cand.no>72?h:undefined, a:cand.no>72?a:undefined},"fd")) updated++;
+        } else if(mm.status==="FINISHED" && ft.home!=null){
+          const pw = sc.penalties && sc.penalties.home!=null ? (sc.penalties.home>sc.penalties.away?h:a) : undefined;
+          if(mergeResult(cand.no,{hs:flip?ft.away:ft.home, as:flip?ft.home:ft.away, status:"FT", pw, h:cand.no>72?h:undefined, a:cand.no>72?a:undefined},"fd")) updated++;
+        }
+      }
+    } else if(manual){ toast("football-data.org unreachable from browser — feed still active"); }
+  }
+  state.lastFetch = Date.now(); save();
+  if(updated){ simCache=null; toast(updated+" match update"+(updated>1?"s":"")+" ⚡"); }
+  else if(manual) toast("Up to date ✓");
+  $("#refreshbtn").textContent = "⟳";
+  $("#lastupd").textContent = "Updated "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+" · Jun 11 – Jul 19";
+  renderAll();
+}
+function anyLiveWindow(){
+  const now = Date.now();
+  return [...GFX,...KFX].some(fx => { const t=new Date(fx[1]).getTime(); return now>t-10*60000 && now<t+140*60000; });
+}
+/* ================= APP ================= */
+function applyTheme(){ document.documentElement.classList.toggle("dark",!!state.dark); document.body.classList.toggle("dark",!!state.dark); }
+function renderAll(){
+  if(curView==="matches") renderMatches();
+  if(curView==="groups") renderGroups();
+  if(curView==="bracket") renderBracket();
+  if(curView==="stats") renderStats();
+  if(curView==="game") renderGame();
+  if(curView==="more") renderMore();
+  $("#livedot").style.background = anyLiveWindow() ? "var(--live)" : "var(--acc2)";
+}
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove("show"),2200); }
+document.querySelectorAll(".tabbar button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll(".tabbar button").forEach(x=>x.classList.toggle("on",x===b));
+    curView = b.dataset.v;
+    for(const v of ["matches","groups","bracket","stats","game","more"]) $("#view-"+v).style.display = v===curView?"":"none";
+    renderAll(); window.scrollTo(0,0);
+  };
+});
+$("#grpmode").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+  $("#grpmode").querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x===c));
+  grpProj = c.dataset.m==="proj"; renderGroups();
+});
+$("#clearbracket").onclick=()=>{ state.bracket={}; save(); renderBracket(); toast("Bracket reset to AI picks"); };
+$("#darkbtn").onclick=()=>{ state.dark=!state.dark; save(); applyTheme(); };
+$("#refreshbtn").onclick=()=>refreshScores(true);
+applyTheme();
+renderAll();
+refreshScores(false);
+setInterval(()=>{ refreshScores(false); }, anyLiveWindow()? 90000 : 300000);
+</script>
+</body>
+</html>
