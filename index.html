@@ -27,6 +27,10 @@ header h1 .dot{width:8px;height:8px;border-radius:50%;background:var(--acc2);dis
 header .sub{font-size:.72rem;color:var(--mut);margin-top:2px}
 .iconbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;font-size:.85rem;cursor:pointer}
 .hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.filterbar{display:flex;gap:8px;padding:8px 14px 0;max-width:680px;margin:0 auto}
+.filterbar select{flex:1;min-width:0;padding:9px 8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:.8rem;appearance:none}
+.filterbar select.active{border-color:var(--acc);color:var(--acc);font-weight:700}
+.filterbar .iconbtn{flex:0 0 auto}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;background:var(--chip);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 13px;font-size:.82rem;cursor:pointer;white-space:nowrap}
@@ -127,6 +131,11 @@ input[type=range]{width:100%}
 </header>
 
 <div id="view-matches">
+  <div class="filterbar">
+    <select id="fteam"><option value="">⚽ All teams</option></select>
+    <select id="fvenue"><option value="">📍 All venues</option></select>
+    <button class="iconbtn" id="fclear" title="Clear filters" style="display:none">✕</button>
+  </div>
   <div class="chips" id="daychips"></div>
   <main id="matchlist"></main>
 </div>
@@ -590,13 +599,39 @@ function renderDays(){
   }).join("");
   $("#daychips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{curDay=c.dataset.d;renderMatches();});
 }
+let filtTeam = "", filtVenue = "";
 function renderMatches(){
-  renderDays();
+  const filtered = !!(filtTeam || filtVenue);
+  $("#daychips").style.display = filtered ? "none" : "";
+  $("#fclear").style.display = filtered ? "" : "none";
+  $("#fteam").classList.toggle("active", !!filtTeam);
+  $("#fvenue").classList.toggle("active", !!filtVenue);
+  if(!filtered) renderDays();
   const {list,R} = allFixtures();
-  const todays = list.filter(m=>dayKey(m.d)===curDay);
-  if(!todays.length){ $("#matchlist").innerHTML = `<div class="empty">No matches this day.</div>`; return; }
-  let html = `<div class="datehead">${fmtD(todays[0].d)} · ${todays.length} matches</div><div class="card">`;
-  for(const m of todays){
+  const shown = filtered
+    ? list.filter(m => (!filtTeam || m.h===filtTeam || m.a===filtTeam) && (!filtVenue || m.v===filtVenue))
+    : list.filter(m => dayKey(m.d)===curDay);
+  if(!shown.length){ $("#matchlist").innerHTML = `<div class="empty">No matches found${filtered?" for this filter":" this day"}.</div>`; return; }
+  let html = "";
+  let lastDay = null, open = false;
+  for(const m of shown){
+    const dk = dayKey(m.d);
+    if(dk!==lastDay){
+      if(open) html += `</div>`;
+      const cnt = shown.filter(x=>dayKey(x.d)===dk).length;
+      html += `<div class="datehead">${fmtD(m.d)} · ${cnt} match${cnt>1?"es":""}</div><div class="card">`;
+      lastDay = dk; open = true;
+    }
+    html += renderMatchRow(m, R);
+  }
+  if(open) html += `</div>`;
+  html += `<div class="src">${filtered?`Showing ${shown.length} matches · ◆ knockout matchups are AI-projected until groups finish`:"Predictions update automatically as results & news come in · AI model: live Elo + form + host edge + your news adjustments"}</div>`;
+  $("#matchlist").innerHTML = html;
+  $("#matchlist").querySelectorAll(".match").forEach(el=>el.onclick=()=>openMatch(+el.dataset.no));
+}
+function renderMatchRow(m, R){
+  let html = "";
+  {
     const st = matchStatus(m);
     const p = (m.h&&m.a) ? matchProbs(R,m.h,m.a,m.v,m.ko) : null;
     const pick = state.picks[m.no];
@@ -617,9 +652,7 @@ function renderMatches(){
       <div class="plabels"><span>${Math.round(p.pH*100)}%</span>${m.ko?"":`<span>draw ${Math.round(p.pD*100)}%</span>`}<span>${Math.round(p.pA*100)}%</span></div>`:""}
     </div>`;
   }
-  html += `</div><div class="src">Predictions update automatically as results & news come in · AI model: live Elo + form + host edge + your news adjustments</div>`;
-  $("#matchlist").innerHTML = html;
-  $("#matchlist").querySelectorAll(".match").forEach(el=>el.onclick=()=>openMatch(+el.dataset.no));
+  return html;
 }
 function renderGroups(){
   const R = liveRatings();
@@ -1105,6 +1138,16 @@ $("#grpmode").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
   grpProj = c.dataset.m==="proj"; renderGroups();
 });
 $("#clearbracket").onclick=()=>{ state.bracket={}; save(); renderBracket(); toast("Bracket reset to AI picks"); };
+/* filter dropdowns */
+(function(){
+  const ft = $("#fteam"), fv = $("#fvenue");
+  Object.keys(TEAMS).sort().forEach(t=>{ const o=document.createElement("option"); o.value=t; o.textContent=`${TEAMS[t].f} ${t} (Grp ${TEAMS[t].g})`; ft.appendChild(o); });
+  const venues = [...new Set([...GFX.map(x=>x[2]),...KFX.map(x=>x[2])])].sort();
+  venues.forEach(v=>{ const o=document.createElement("option"); o.value=v; const cc=VENUE_CC[v]==="MX"?"🇲🇽":VENUE_CC[v]==="CA"?"🇨🇦":"🇺🇸"; o.textContent=`${cc} ${v.replace(" Stadium","")}`; fv.appendChild(o); });
+  ft.onchange = ()=>{ filtTeam = ft.value; renderMatches(); };
+  fv.onchange = ()=>{ filtVenue = fv.value; renderMatches(); };
+  $("#fclear").onclick = ()=>{ filtTeam=filtVenue=""; ft.value=fv.value=""; renderMatches(); };
+})();
 $("#darkbtn").onclick=()=>{ state.dark=!state.dark; save(); applyTheme(); };
 $("#refreshbtn").onclick=()=>refreshScores(true);
 applyTheme();
