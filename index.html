@@ -57,6 +57,10 @@ main{padding:0 12px;max-width:680px;margin:0 auto}
 .badge.live{background:var(--live);color:#fff;animation:pulse 1.4s infinite}
 .badge.ft{background:var(--chip)}
 .badge.pick{background:var(--warn);color:#fff}
+.badge.proj{background:transparent;color:var(--warn);border:1px dashed var(--warn)}
+.match.proj{border-left:3px dashed var(--warn);background:color-mix(in srgb,var(--warn) 4%,transparent)}
+.match.proj .team .nm{opacity:.8;font-style:italic}
+.match.proj .score{color:var(--warn)}
 @keyframes pulse{50%{opacity:.55}}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th,td{padding:7px 8px;text-align:center;border-top:1px solid var(--line)}
@@ -114,6 +118,75 @@ input[type=range]{width:100%}
 .toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:.8rem;z-index:60;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:.95}
 .src{font-size:.66rem;color:var(--mut);text-align:center;padding:8px 0 16px}
+.matchcenter{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.mc-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.mc-sub{font-size:.7rem;color:var(--mut)}
+.mc-loading,.mc-empty{font-size:.76rem;color:var(--mut);line-height:1.5;padding:10px 0}
+.goal-list{display:grid;gap:8px;margin-top:10px}
+.goal-item{display:flex;gap:10px;align-items:flex-start;background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:10px}
+.goal-min{min-width:48px;border-radius:10px;background:var(--card);border:1px solid var(--line);padding:6px 8px;text-align:center;font-weight:800;font-size:.8rem}
+.goal-body{flex:1;min-width:0}
+.goal-top{display:flex;align-items:center;gap:10px}
+.goal-ava{width:42px;height:42px;border-radius:50%;overflow:hidden;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.goal-ava img{width:100%;height:100%;object-fit:cover}
+.goal-ava.jersey img{object-fit:contain;padding:4px}
+.goal-body b{display:block;font-size:.88rem}
+.goal-body div{font-size:.72rem;color:var(--mut);line-height:1.35}
+.goal-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.goal-flags span{font-size:.62rem;font-weight:700;padding:3px 7px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.duelgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.duel{background:var(--chip);border-radius:12px;padding:10px;text-align:center}
+.duel b{display:block;font-size:.96rem}
+.duel span{display:block;font-size:.62rem;color:var(--mut);text-transform:uppercase;margin-top:3px}
+.lineup-shell{margin-top:14px}
+.lineup-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 8px}
+.lineup-tab{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 12px;font-size:.74rem;font-weight:700;cursor:pointer}
+.lineup-tab.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.lineup-meta{font-size:.72rem;color:var(--mut);margin-bottom:8px}
+.pitch{background:
+  radial-gradient(circle at center, rgba(255,255,255,.12) 0, rgba(255,255,255,.12) 13%, transparent 13.4%) center/100% 100% no-repeat,
+  linear-gradient(180deg, color-mix(in srgb,var(--acc2) 18%, transparent), transparent 25%, transparent 75%, color-mix(in srgb,var(--acc) 14%, transparent)),
+  linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,.18) 49.5%, rgba(255,255,255,.18) 50.5%, transparent 50.5%),
+  linear-gradient(180deg, #0f6f48, #0b5d3a);
+  border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:12px 8px;display:flex;flex-direction:column;gap:8px}
+.pitch-row{display:flex;justify-content:center;gap:8px;flex-wrap:nowrap}
+.pc{appearance:none;border:1px solid rgba(255,255,255,.18);background:rgba(7,20,16,.34);color:#fff;border-radius:12px;padding:6px 4px;width:74px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.pc.on{border-color:#fff;transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.22)}
+.pcimg{width:40px;height:40px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
+.pcimg img{width:100%;height:100%;object-fit:cover}
+.pcimg.jersey img{object-fit:contain;padding:4px}
+.pcnum{font-size:.62rem;font-weight:800;opacity:.9}
+.pcnm{font-size:.64rem;font-weight:700;line-height:1.15;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.pcpos{font-size:.54rem;letter-spacing:.04em;opacity:.78}
+.pcbadges{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.pcbadge{font-size:.52rem;font-weight:700;padding:2px 4px;border-radius:999px;background:rgba(255,255,255,.15)}
+.benchlist{display:grid;gap:8px}
+.benchitem{appearance:none;width:100%;display:flex;align-items:center;gap:10px;background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:8px 10px;color:var(--ink);text-align:left;cursor:pointer}
+.benchitem.on{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.benchimg{width:42px;height:42px;border-radius:50%;overflow:hidden;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.benchimg img{width:100%;height:100%;object-fit:cover}
+.benchimg.jersey img{object-fit:contain;padding:4px}
+.benchmeta{flex:1;min-width:0}
+.benchmeta b{display:block;font-size:.84rem;line-height:1.2}
+.benchmeta div{font-size:.68rem;color:var(--mut)}
+.focuscard{display:flex;gap:10px;align-items:flex-start;background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:10px}
+.focusmedia{width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.focusmedia img{width:100%;height:100%;object-fit:cover}
+.focusmedia.jersey img{object-fit:contain;padding:5px}
+.focusmeta{flex:1;min-width:0}
+.focusmeta b{display:block;font-size:.9rem;line-height:1.2}
+.focussub{font-size:.72rem;color:var(--mut);margin-top:3px}
+.focusstats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.focusstats span{font-size:.62rem;font-weight:700;padding:4px 7px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.mclink{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:700;color:var(--acc);text-decoration:none}
+@media (max-width:520px){
+  .pitch-row{gap:6px}
+  .pc{width:62px;padding:6px 3px}
+  .pcimg{width:34px;height:34px}
+  .pcnm{font-size:.58rem}
+  .pcpos{font-size:.5rem}
+  .goal-min{min-width:42px}
+}
 </style>
 </head>
 <body>
@@ -133,6 +206,7 @@ input[type=range]{width:100%}
 <div id="view-matches">
   <div class="filterbar">
     <select id="fteam"><option value="">⚽ All teams</option></select>
+    <select id="fstage"><option value="">🏁 All stages</option><option value="G">Group stage</option><option value="R32">Round of 32</option><option value="R16">Round of 16</option><option value="QF">Quarter-finals</option><option value="SF">Semi-finals</option><option value="F">Final & 3rd place</option></select>
     <select id="fvenue"><option value="">📍 All venues</option></select>
     <button class="iconbtn" id="fclear" title="Clear filters" style="display:none">✕</button>
   </div>
@@ -353,10 +427,11 @@ let state = {
   news:    LS("news")    || {},      // team -> -100..100 adjustment
   fdKey:   LS("fdKey")   || "",
   dark:    LS("dark"),
-  lastFetch: LS("lastFetch") || 0
+  lastFetch: LS("lastFetch") || 0,
+  eventMap: LS("eventMap") || {}     // matchNo -> ESPN event id
 };
 if(state.dark === null) state.dark = matchMedia("(prefers-color-scheme: dark)").matches;
-const save = () => { SV("results",state.results); SV("picks",state.picks); SV("bracket",state.bracket); SV("news",state.news); SV("fdKey",state.fdKey); SV("dark",state.dark); SV("lastFetch",state.lastFetch); };
+const save = () => { SV("results",state.results); SV("picks",state.picks); SV("bracket",state.bracket); SV("news",state.news); SV("fdKey",state.fdKey); SV("dark",state.dark); SV("lastFetch",state.lastFetch); SV("eventMap",state.eventMap); };
 
 /* ================= ENGINE ================= */
 // Dynamic ratings: base Elo, updated by every finished result (K=40, margin multiplier), plus user news adjustment.
@@ -568,6 +643,10 @@ const todayKey = () => dayKey(Date.now());
 const TF = t => TEAMS[t] ? TEAMS[t].f : "▫️";
 const TN = t => t || "TBD";
 let curDay = null, grpProj = false, simCache = null, curView = "matches";
+const matchCenterCache = {};
+const matchCenterPending = {};
+const matchCenterView = {};
+let activeSheetMatch = null;
 
 function allFixtures(){
   const R = liveRatings();
@@ -599,17 +678,20 @@ function renderDays(){
   }).join("");
   $("#daychips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{curDay=c.dataset.d;renderMatches();});
 }
-let filtTeam = "", filtVenue = "";
+let filtTeam = "", filtVenue = "", filtStage = "";
+const STAGE_RANGE = {G:[1,72], R32:[73,88], R16:[89,96], QF:[97,100], SF:[101,102], F:[103,104]};
 function renderMatches(){
-  const filtered = !!(filtTeam || filtVenue);
+  const filtered = !!(filtTeam || filtVenue || filtStage);
   $("#daychips").style.display = filtered ? "none" : "";
   $("#fclear").style.display = filtered ? "" : "none";
   $("#fteam").classList.toggle("active", !!filtTeam);
   $("#fvenue").classList.toggle("active", !!filtVenue);
+  $("#fstage").classList.toggle("active", !!filtStage);
   if(!filtered) renderDays();
   const {list,R} = allFixtures();
+  const sr = STAGE_RANGE[filtStage];
   const shown = filtered
-    ? list.filter(m => (!filtTeam || m.h===filtTeam || m.a===filtTeam) && (!filtVenue || m.v===filtVenue))
+    ? list.filter(m => (!filtTeam || m.h===filtTeam || m.a===filtTeam) && (!filtVenue || m.v===filtVenue) && (!sr || (m.no>=sr[0] && m.no<=sr[1])))
     : list.filter(m => dayKey(m.d)===curDay);
   if(!shown.length){ $("#matchlist").innerHTML = `<div class="empty">No matches found${filtered?" for this filter":" this day"}.</div>`; return; }
   let html = "";
@@ -625,7 +707,8 @@ function renderMatches(){
     html += renderMatchRow(m, R);
   }
   if(open) html += `</div>`;
-  html += `<div class="src">${filtered?`Showing ${shown.length} matches · ◆ knockout matchups are AI-projected until groups finish`:"Predictions update automatically as results & news come in · AI model: live Elo + form + host edge + your news adjustments"}</div>`;
+  const hasProj = shown.some(m=>m.ko&&m.projected);
+  html += `<div class="src">${hasProj?'<span style="color:var(--warn)">◆ amber dashed = matchup not decided yet — teams are AI projections and update as real results arrive</span><br>':''}${filtered?`Showing ${shown.length} matches`:"Predictions update automatically as results & news come in · AI model: live Elo + form + host edge + your news adjustments"}</div>`;
   $("#matchlist").innerHTML = html;
   $("#matchlist").querySelectorAll(".match").forEach(el=>el.onclick=()=>openMatch(+el.dataset.no));
 }
@@ -640,9 +723,10 @@ function renderMatchRow(m, R){
     else if(st.s==="LIVE") mid = `<div class="score live">${st.hs??0} – ${st.as??0}<span class="tm">${st.min||"LIVE"}'</span></div>`;
     else if(st.s==="LIVE?") mid = `<div class="score live">${st.hs??"–"} ${st.hs!=null?"–":""} ${st.as??""}<span class="tm">In play</span></div>`;
     else mid = `<div class="score">${p?esc(p.hs+" : "+p.as):"vs"}<span class="tm">${fmtT(m.d)}</span></div>`;
-    html += `<div class="match" data-no="${m.no}">
+    const isProj = m.ko && m.projected && st.s!=="FT";
+    html += `<div class="match${isProj?" proj":""}" data-no="${m.no}">
       <div class="mtop"><span>${ROUNDNAME(m.no)}${m.g?" "+m.g:""} · M${m.no}</span>
-      <span>${st.s==="LIVE"||st.s==="LIVE?"?'<span class="badge live">LIVE</span>':st.s==="FT"?'<span class="badge ft">FT</span>':pick?'<span class="badge pick">PICKED</span>':""} ${esc(m.v.replace(" Stadium",""))}</span></div>
+      <span>${st.s==="LIVE"||st.s==="LIVE?"?'<span class="badge live">LIVE</span>':st.s==="FT"?'<span class="badge ft">FT</span>':isProj?'<span class="badge proj">◆ AI PROJECTED</span>':pick?'<span class="badge pick">PICKED</span>':""} ${esc(m.v.replace(" Stadium",""))}</span></div>
       <div class="mrow">
         <div class="team"><span class="flag">${TF(m.h)}</span><span class="nm">${esc(TN(m.h))}</span></div>
         ${mid}
@@ -830,10 +914,225 @@ function renderMore(){
   $("#refresh2").onclick=()=>refreshScores(true);
   $("#resetall").onclick=()=>{ if(confirm("Wipe picks, bracket, news tweaks and cached scores?")){ localStorage.clear(); location.reload(); } };
 }
+function renderAvatar(url, mode, cls, alt, fallback){
+  return `<div class="${cls}${mode==="contain"?" jersey":""}">${url?`<img src="${esc(url)}" alt="${esc(alt||"Player")}">`:`<span>${esc(fallback||"")}</span>`}</div>`;
+}
+function formationRows(side){
+  const starters = (side.players||[]).filter(player => player.starter);
+  if(!starters.length) return [];
+  const sorted = [...starters].sort((a,b)=>
+    (a.formationPlace||99)-(b.formationPlace||99) ||
+    ((+a.jersey||99)-(+b.jersey||99)) ||
+    a.name.localeCompare(b.name)
+  );
+  const keeper = sorted.find(player => player.position==="G") || sorted[0];
+  const outfield = sorted.filter(player => player!==keeper);
+  let groups = (side.formation||"").split("-").map(n=>+n).filter(Boolean);
+  if(groups.reduce((sum,n)=>sum+n,0)!==outfield.length){
+    const first = Math.ceil(outfield.length/3);
+    const second = Math.ceil((outfield.length-first)/2);
+    const third = Math.max(0, outfield.length-first-second);
+    groups = [first,second,third].filter(Boolean);
+  }
+  const rows = [];
+  let idx = 0;
+  for(const size of groups){
+    rows.push(outfield.slice(idx, idx+size));
+    idx += size;
+  }
+  if(idx<outfield.length) rows.push(outfield.slice(idx));
+  rows.reverse();
+  if(keeper) rows.push([keeper]);
+  return rows.filter(row => row.length);
+}
+function playerBadges(player){
+  const out = [];
+  const goals = statNum(player.stats,"totalGoals");
+  const assists = statNum(player.stats,"goalAssists");
+  const yellow = statNum(player.stats,"yellowCards");
+  const red = statNum(player.stats,"redCards");
+  if(goals) out.push("G "+goals);
+  if(assists) out.push("A "+assists);
+  if(yellow) out.push("YC");
+  if(red) out.push("RC");
+  if(player.subbedIn) out.push("SUB");
+  if(player.subbedOut) out.push("OFF");
+  return out.slice(0,3);
+}
+function focusStatChips(player){
+  const chips = [];
+  const goals = statNum(player.stats,"totalGoals");
+  const assists = statNum(player.stats,"goalAssists");
+  const shots = statNum(player.stats,"totalShots");
+  const onTarget = statNum(player.stats,"shotsOnTarget");
+  const fouls = statNum(player.stats,"foulsCommitted");
+  const saves = statNum(player.stats,"saves");
+  const yellow = statNum(player.stats,"yellowCards");
+  const red = statNum(player.stats,"redCards");
+  if(goals) chips.push("Goals "+goals);
+  if(assists) chips.push("Assists "+assists);
+  if(shots) chips.push("Shots "+shots);
+  if(onTarget) chips.push("On target "+onTarget);
+  if(fouls) chips.push("Fouls "+fouls);
+  if(saves) chips.push("Saves "+saves);
+  if(yellow) chips.push("Yellow "+yellow);
+  if(red) chips.push("Red "+red);
+  return chips;
+}
+function renderFocusCard(side, player){
+  if(!player) return "";
+  const chips = focusStatChips(player);
+  return `<div class="focuscard">
+    ${renderAvatar(player.image, player.imageMode, "focusmedia", player.name, player.jersey || side.abbr)}
+    <div class="focusmeta">
+      <b>${esc(player.name)}</b>
+      <div class="focussub">${esc(side.abbr||side.name)} ${player.jersey?`#${esc(player.jersey)} · `:""}${esc(player.position||"Squad")}</div>
+      <div class="focusstats">${(chips.length?chips:[player.starter?"Starting XI":"Bench available"]).map(chip=>`<span>${esc(chip)}</span>`).join("")}</div>
+      ${player.link?`<a class="mclink" href="${esc(player.link)}" target="_blank" rel="noopener">Open ESPN player page</a>`:""}
+    </div>
+  </div>`;
+}
+function renderMatchCenterPlaceholder(message){
+  return `<div class="matchcenter">
+    <div class="mc-top"><h3>Match center</h3><span class="mc-sub">Public ESPN feed</span></div>
+    <div class="mc-loading">${esc(message)}</div>
+  </div>`;
+}
+function renderMatchCenter(no, m, data){
+  const ui = matchCenterView[no] || (matchCenterView[no] = {side:data.lineups.home?"home":data.lineups.away?"away":"home", view:"starters", focus:""});
+  if(!data.lineups[ui.side]) ui.side = data.lineups.home ? "home" : data.lineups.away ? "away" : ui.side;
+  const activeSide = data.lineups[ui.side];
+  const sidePlayers = activeSide ? (ui.view==="bench" ? activeSide.players.filter(player => !player.starter) : activeSide.players.filter(player => player.starter)) : [];
+  if(sidePlayers.length && !sidePlayers.some(player => (player.id||player.name)===ui.focus)) ui.focus = sidePlayers[0].id || sidePlayers[0].name;
+  const focused = sidePlayers.find(player => (player.id||player.name)===ui.focus) || sidePlayers[0] || null;
+  const homeStats = data.stats.home || {abbr:TEAMS[m.h]?.c||"HOME", values:{}};
+  const awayStats = data.stats.away || {abbr:TEAMS[m.a]?.c||"AWAY", values:{}};
+  const hasStats = Object.keys(homeStats.values||{}).length || Object.keys(awayStats.values||{}).length;
+  const duels = [
+    {label:"Possession", home:(statNum(homeStats.values,"possessionPct")||0).toFixed(1).replace(/\.0$/,"")+"%", away:(statNum(awayStats.values,"possessionPct")||0).toFixed(1).replace(/\.0$/,"")+"%"},
+    {label:"Shots", home:homeStats.values.totalShots||"--", away:awayStats.values.totalShots||"--"},
+    {label:"On target", home:homeStats.values.shotsOnTarget||"--", away:awayStats.values.shotsOnTarget||"--"}
+  ];
+  const goalHtml = data.goals.length
+    ? `<div class="goal-list">${data.goals.map(goal=>`<div class="goal-item">
+        <div class="goal-min">${esc(goal.time||"Goal")}</div>
+        <div class="goal-body">
+          <div class="goal-top">
+            ${renderAvatar(goal.image, goal.imageMode, "goal-ava", goal.player, goal.teamAbbr || "G")}
+            <div>
+              <b>${esc(goal.player)}</b>
+              <div>${esc(goal.teamName||goal.teamAbbr||"")} ${goal.assist?`· Assist: ${esc(goal.assist)}`:""}</div>
+            </div>
+          </div>
+          ${(goal.penalty||goal.ownGoal)?`<div class="goal-flags">${goal.penalty?`<span>Penalty</span>`:""}${goal.ownGoal?`<span>Own goal</span>`:""}</div>`:""}
+        </div>
+      </div>`).join("")}</div>`
+    : `<div class="mc-empty">No goals logged yet. This timeline fills automatically as ESPN posts match events.</div>`;
+  let lineupHtml = `<div class="mc-empty">Lineups have not been published for this match yet.</div>`;
+  if(activeSide && activeSide.players.length){
+    const tabs = [data.lineups.home, data.lineups.away].filter(Boolean).map(side=>`<button type="button" class="lineup-tab ${ui.side===side.homeAway?"on":""}" data-mc-side="${side.homeAway}">${esc(side.abbr||side.name)}</button>`).join("");
+    const viewTabs = `
+      <button type="button" class="lineup-tab ${ui.view==="starters"?"on":""}" data-mc-view="starters">Starting XI</button>
+      <button type="button" class="lineup-tab ${ui.view==="bench"?"on":""}" data-mc-view="bench">Bench</button>`;
+    const pitchRows = formationRows(activeSide);
+    const pitchHtml = `<div class="pitch">${pitchRows.map(row=>`<div class="pitch-row">${row.map(player=>`<button type="button" class="pc ${(player.id||player.name)===ui.focus?"on":""}" data-player="${esc(player.id||player.name)}">
+      ${renderAvatar(player.image, player.imageMode, "pcimg", player.name, player.jersey || activeSide.abbr)}
+      <div class="pcnum">${player.jersey?`#${esc(player.jersey)}`:""}</div>
+      <div class="pcnm">${esc(player.short||player.name)}</div>
+      <div class="pcpos">${esc(player.position||"SQ")}</div>
+      <div class="pcbadges">${playerBadges(player).map(badge=>`<span class="pcbadge">${esc(badge)}</span>`).join("")}</div>
+    </button>`).join("")}</div>`).join("")}</div>`;
+    const benchHtml = `<div class="benchlist">${activeSide.players.filter(player => !player.starter).map(player=>`<button type="button" class="benchitem ${(player.id||player.name)===ui.focus?"on":""}" data-player="${esc(player.id||player.name)}">
+      ${renderAvatar(player.image, player.imageMode, "benchimg", player.name, player.jersey || activeSide.abbr)}
+      <div class="benchmeta">
+        <b>${esc(player.name)}</b>
+        <div>${player.jersey?`#${esc(player.jersey)} · `:""}${esc(player.position||"Bench")} ${player.subbedIn?"· Subbed on":""}${player.subbedOut?" · Subbed off":""}</div>
+      </div>
+    </button>`).join("") || `<div class="mc-empty">No bench data in this feed yet.</div>`}</div>`;
+    lineupHtml = `<div class="lineup-shell">
+      <div class="mc-top"><h3>Interactive lineups</h3><span class="mc-sub">Tap a player for stats</span></div>
+      <div class="lineup-tabs">${tabs}</div>
+      <div class="lineup-tabs">${viewTabs}</div>
+      <div class="lineup-meta">${esc(activeSide.name)}${activeSide.formation?` · Formation ${esc(activeSide.formation)}`:""}</div>
+      ${ui.view==="starters" ? pitchHtml : benchHtml}
+      ${renderFocusCard(activeSide, focused)}
+    </div>`;
+  }
+  return `<div class="matchcenter">
+    <div class="mc-top"><h3>Match center</h3><span class="mc-sub">${data.updatedAt?`Updated ${esc(new Date(data.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}))}`:"Public ESPN feed"}</span></div>
+    <h3 style="margin-top:12px">Who scored and when</h3>
+    ${goalHtml}
+    ${hasStats?`<div class="duelgrid">${duels.map(duel=>`<div class="duel"><b>${esc(String(duel.home))} - ${esc(String(duel.away))}</b><span>${esc(duel.label)}</span><div class="mc-sub" style="margin-top:5px">${esc(homeStats.abbr||"HOME")} vs ${esc(awayStats.abbr||"AWAY")}</div></div>`).join("")}</div>`:`<div class="mc-empty">Live match stats appear here once ESPN publishes the box score.</div>`}
+    ${lineupHtml}
+    <a class="mclink" href="${esc(data.link)}" target="_blank" rel="noopener">Open ESPN match source</a>
+  </div>`;
+}
+function rerenderMatchCenter(no, m){
+  const root = $("#matchcenter");
+  const data = matchCenterCache[no];
+  if(!root || !data) return;
+  root.innerHTML = renderMatchCenter(no, m, data);
+  bindMatchCenter(no, m);
+}
+function bindMatchCenter(no, m){
+  const root = $("#matchcenter");
+  if(!root) return;
+  root.querySelectorAll("[data-mc-side]").forEach(btn=>btn.onclick=()=>{
+    matchCenterView[no] = matchCenterView[no] || {side:"home", view:"starters", focus:""};
+    matchCenterView[no].side = btn.dataset.mcSide;
+    matchCenterView[no].focus = "";
+    rerenderMatchCenter(no, m);
+  });
+  root.querySelectorAll("[data-mc-view]").forEach(btn=>btn.onclick=()=>{
+    matchCenterView[no] = matchCenterView[no] || {side:"home", view:"starters", focus:""};
+    matchCenterView[no].view = btn.dataset.mcView;
+    matchCenterView[no].focus = "";
+    rerenderMatchCenter(no, m);
+  });
+  root.querySelectorAll("[data-player]").forEach(btn=>btn.onclick=()=>{
+    matchCenterView[no] = matchCenterView[no] || {side:"home", view:"starters", focus:""};
+    matchCenterView[no].focus = btn.dataset.player;
+    rerenderMatchCenter(no, m);
+  });
+}
+async function hydrateMatchCenter(no, m){
+  const root = $("#matchcenter");
+  if(!root) return;
+  if(!m || !m.h || !m.a || m.projected){
+    root.innerHTML = renderMatchCenterPlaceholder("Lineups and scorer details unlock once the matchup is confirmed on the live feed.");
+    return;
+  }
+  const cached = matchCenterCache[no];
+  const liveish = ["LIVE","LIVE?"].includes(matchStatus(m).s);
+  const stale = !!(cached && liveish && Date.now()-cached.fetchedAt>60000);
+  if(cached){
+    root.innerHTML = renderMatchCenter(no, m, cached);
+    bindMatchCenter(no, m);
+    if(!stale) return;
+  } else {
+    root.innerHTML = renderMatchCenterPlaceholder("Loading live match center...");
+  }
+  if(!matchCenterPending[no]){
+    matchCenterPending[no] = loadMatchCenter(no, m).then(data => {
+      if(data) data.fetchedAt = Date.now();
+      return data;
+    }).finally(()=>{ delete matchCenterPending[no]; });
+  }
+  const data = await matchCenterPending[no];
+  if(activeSheetMatch!==no || !$("#matchcenter")) return;
+  if(!data){
+    if(!matchCenterCache[no]) $("#matchcenter").innerHTML = renderMatchCenterPlaceholder("Live match center is unavailable right now. Try again after refreshing scores.");
+    return;
+  }
+  matchCenterCache[no] = data;
+  $("#matchcenter").innerHTML = renderMatchCenter(no, m, data);
+  bindMatchCenter(no, m);
+}
 /* ---- Match sheet ---- */
 function openMatch(no){
   const {list,R} = allFixtures();
   const m = list.find(x=>x.no===no); if(!m) return;
+  activeSheetMatch = no;
   const st = matchStatus(m);
   const p = (m.h&&m.a)?matchProbs(R,m.h,m.a,m.v,m.ko):null;
   const r = state.results[no]||{};
@@ -848,6 +1147,7 @@ function openMatch(no){
     <div class="team right" data-t="${esc(m.a||"")}"><span class="nm">${esc(TN(m.a))}</span><span class="flag" style="font-size:2rem">${TF(m.a)}</span></div>
   </div>
   <div class="note" style="text-align:center">${esc(m.v)} · ${VENUE_CC[m.v]==="MX"?"🇲🇽 Mexico":VENUE_CC[m.v]==="CA"?"🇨🇦 Canada":"🇺🇸 USA"}</div>`;
+  html += `<div id="matchcenter">${renderMatchCenterPlaceholder("Loading live match center...")}</div>`;
   if(p){
     html += `<h3 style="margin-top:12px">AI prediction ${st.s==="FT"?"(pre-match)":""}</h3>
     <div class="pbar" style="height:10px"><i class="h" style="width:${p.pH*100}%"></i><i class="d" style="width:${p.pD*100}%"></i><i class="a" style="width:${p.pA*100}%"></i></div>
@@ -888,6 +1188,7 @@ function openMatch(no){
   }
   if(st.s==="FT"){ html += `<div class="note" style="text-align:center;margin-top:10px">Full time. Ratings updated. ${r.manual?'<button class="btn sm sec" id="undores">Undo manual result</button>':""}</div>`; }
   openSheet(html);
+  hydrateMatchCenter(no, m);
   $("#sheet").querySelectorAll(".team[data-t]").forEach(el=>{ if(el.dataset.t) el.onclick=()=>openTeam(el.dataset.t); });
   if(canPick){
     let out = (pk||{}).out || (p.pH>=p.pA?"H":"A");
@@ -912,6 +1213,7 @@ function openMatch(no){
 /* ---- Team sheet ---- */
 function openTeam(t){
   if(!TEAMS[t]) return;
+  activeSheetMatch = null;
   const T = TEAMS[t], R = liveRatings();
   const na = state.news[t]||0, fa = formAdj(t), eloDelta = Math.round(R[t]-T.r);
   const played = [];
@@ -962,7 +1264,7 @@ function openTeam(t){
   };
 }
 function openSheet(html){ $("#sheet").innerHTML = html; $("#modal").classList.add("open"); }
-function closeSheet(){ $("#modal").classList.remove("open"); }
+function closeSheet(){ activeSheetMatch = null; $("#modal").classList.remove("open"); }
 $("#modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeSheet(); });
 
 /* ================= LIVE DATA ================= */
@@ -1022,6 +1324,7 @@ async function fetchESPN(){
       const h = canon(home.team.displayName)||canon(home.team.shortDisplayName), a = canon(away.team.displayName)||canon(away.team.shortDisplayName);
       if(!h||!a) continue;
       const hit = findMatchNo(h,a,ev.date); if(!hit) continue;
+      state.eventMap[hit.no] = ev.id;
       const st = ev.status&&ev.status.type?ev.status.type.state:"pre";
       const hs0 = +home.score||0, as0 = +away.score||0;
       const hs = hit.flip?as0:hs0, as = hit.flip?hs0:as0;
@@ -1041,6 +1344,139 @@ async function fetchESPN(){
   return updated;
 }
 /* Google News RSS scan → suggested news adjustment for a team */
+function espnDateKey(d){
+  return String(d).slice(0,10).replace(/-/g,"");
+}
+function indexStats(list){
+  const out = {};
+  for(const item of list||[]) out[item.name] = item.displayValue ?? item.value ?? "";
+  return out;
+}
+function statNum(stats, name){
+  const raw = stats && stats[name];
+  if(raw == null || raw === "") return 0;
+  const n = typeof raw==="number" ? raw : parseFloat(String(raw).replace(/[^\d.-]/g,""));
+  return Number.isFinite(n) ? n : 0;
+}
+function normalizeRosterPlayer(player, teamLogo){
+  const athlete = player.athlete || {};
+  const headshot = athlete.headshot && athlete.headshot.href ? athlete.headshot.href : "";
+  const jerseyImage = (((athlete.jerseyImages||[])[0])||{}).href || "";
+  return {
+    id: String(athlete.id||""),
+    name: athlete.displayName || athlete.shortName || "Unknown player",
+    short: athlete.shortName || athlete.displayName || "Unknown player",
+    jersey: player.jersey || "",
+    position: player.position && player.position.abbreviation ? player.position.abbreviation : "",
+    starter: !!player.starter,
+    subbedIn: !!player.subbedIn,
+    subbedOut: !!player.subbedOut,
+    formationPlace: +(player.formationPlace || 0),
+    link: (((athlete.links||[])[0])||{}).href || "",
+    image: headshot || jerseyImage || teamLogo || "",
+    imageMode: headshot ? "cover" : "contain",
+    stats: indexStats(player.stats || [])
+  };
+}
+function normalizeRosterSide(side){
+  const teamLogo = ((((side.team||{}).logos||[])[0])||{}).href || "";
+  const players = (side.roster||[]).map(player => normalizeRosterPlayer(player, teamLogo));
+  players.sort((a,b)=>
+    (a.starter===b.starter ? 0 : a.starter ? -1 : 1) ||
+    (a.formationPlace||99)-(b.formationPlace||99) ||
+    ((+a.jersey||99)-(+b.jersey||99)) ||
+    a.name.localeCompare(b.name)
+  );
+  return {
+    homeAway: side.homeAway || "",
+    name: side.team && side.team.displayName ? side.team.displayName : "",
+    abbr: side.team && side.team.abbreviation ? side.team.abbreviation : "",
+    color: side.team && side.team.color ? side.team.color : "",
+    altColor: side.team && side.team.alternateColor ? side.team.alternateColor : "",
+    logo: teamLogo,
+    formation: side.formation || "",
+    players
+  };
+}
+function buildAthleteIndex(lineups){
+  const index = {};
+  for(const key of ["home","away"]){
+    const side = lineups[key];
+    if(!side) continue;
+    for(const player of side.players){
+      if(player.id) index[player.id] = player;
+    }
+  }
+  return index;
+}
+function normalizeGoalEvent(detail, athleteIndex){
+  const participants = detail.participants || [];
+  const scorer = (participants[0]||{}).athlete || {};
+  const assist = (participants[1]||{}).athlete || {};
+  const linked = athleteIndex[String(scorer.id||"")] || null;
+  return {
+    id: String(scorer.id || (detail.clock && detail.clock.displayValue) || Math.random()),
+    time: detail.clock && detail.clock.displayValue ? detail.clock.displayValue : "",
+    teamId: detail.team && detail.team.id ? detail.team.id : "",
+    teamName: detail.team && detail.team.displayName ? detail.team.displayName : "",
+    teamAbbr: detail.team && detail.team.abbreviation ? detail.team.abbreviation : "",
+    player: scorer.displayName || "Goal",
+    assist: assist.displayName || "",
+    penalty: !!detail.penaltyKick,
+    ownGoal: !!detail.ownGoal,
+    image: linked ? linked.image : "",
+    imageMode: linked ? linked.imageMode : "cover"
+  };
+}
+async function resolveEspnEventId(no, m){
+  if(state.eventMap[no]) return state.eventMap[no];
+  if(!m || !m.h || !m.a || m.projected) return null;
+  const data = await fetchJSON("https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates="+espnDateKey(m.d));
+  if(!data || !data.events) return null;
+  for(const ev of data.events){
+    const comp = (ev.competitions||[])[0]; if(!comp) continue;
+    const home = comp.competitors.find(c=>c.homeAway==="home"), away = comp.competitors.find(c=>c.homeAway==="away");
+    if(!home||!away) continue;
+    const h = canon(home.team.displayName)||canon(home.team.shortDisplayName), a = canon(away.team.displayName)||canon(away.team.shortDisplayName);
+    if(!h||!a) continue;
+    if((h===m.h && a===m.a) || (h===m.a && a===m.h)){
+      state.eventMap[no] = ev.id;
+      save();
+      return ev.id;
+    }
+  }
+  return null;
+}
+async function loadMatchCenter(no, m){
+  const eventId = await resolveEspnEventId(no, m);
+  if(!eventId) return null;
+  const summary = await fetchJSON("https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event="+eventId);
+  if(!summary) return null;
+  const lineups = {};
+  for(const side of summary.rosters||[]){
+    if(side && side.homeAway) lineups[side.homeAway] = normalizeRosterSide(side);
+  }
+  const athleteIndex = buildAthleteIndex(lineups);
+  const comp = ((((summary.header||{}).competitions)||[])[0]) || {};
+  const details = (comp.details || []).filter(item => item.scoringPlay);
+  const stats = {};
+  for(const side of ((summary.boxscore||{}).teams||[])){
+    stats[side.homeAway] = {
+      name: side.team && side.team.displayName ? side.team.displayName : "",
+      abbr: side.team && side.team.abbreviation ? side.team.abbreviation : "",
+      color: side.team && side.team.color ? side.team.color : "",
+      values: indexStats(side.statistics || [])
+    };
+  }
+  return {
+    eventId,
+    updatedAt: (summary.meta||{}).lastUpdatedAt || "",
+    link: "https://www.espn.com/soccer/match/_/gameId/"+eventId,
+    goals: details.map(detail => normalizeGoalEvent(detail, athleteIndex)),
+    lineups,
+    stats
+  };
+}
 const NEG_WORDS = ["injur","ruled out","out of","doubt","suspend","ban","sidelin","blow","miss the","misses","strain","hamstring","fracture","surgery","illness","crisis","fitness concern","unavailable","withdraw"];
 const POS_WORDS = ["returns","return to","fit again","boost","cleared","back in training","recovered","available again","full squad","passed fit","in form","unbeaten"];
 async function scanNews(team){
@@ -1144,9 +1580,11 @@ $("#clearbracket").onclick=()=>{ state.bracket={}; save(); renderBracket(); toas
   Object.keys(TEAMS).sort().forEach(t=>{ const o=document.createElement("option"); o.value=t; o.textContent=`${TEAMS[t].f} ${t} (Grp ${TEAMS[t].g})`; ft.appendChild(o); });
   const venues = [...new Set([...GFX.map(x=>x[2]),...KFX.map(x=>x[2])])].sort();
   venues.forEach(v=>{ const o=document.createElement("option"); o.value=v; const cc=VENUE_CC[v]==="MX"?"🇲🇽":VENUE_CC[v]==="CA"?"🇨🇦":"🇺🇸"; o.textContent=`${cc} ${v.replace(" Stadium","")}`; fv.appendChild(o); });
+  const fs = $("#fstage");
   ft.onchange = ()=>{ filtTeam = ft.value; renderMatches(); };
   fv.onchange = ()=>{ filtVenue = fv.value; renderMatches(); };
-  $("#fclear").onclick = ()=>{ filtTeam=filtVenue=""; ft.value=fv.value=""; renderMatches(); };
+  fs.onchange = ()=>{ filtStage = fs.value; renderMatches(); };
+  $("#fclear").onclick = ()=>{ filtTeam=filtVenue=filtStage=""; ft.value=fv.value=fs.value=""; renderMatches(); };
 })();
 $("#darkbtn").onclick=()=>{ state.dark=!state.dark; save(); applyTheme(); };
 $("#refreshbtn").onclick=()=>refreshScores(true);
