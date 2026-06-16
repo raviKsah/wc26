@@ -179,6 +179,17 @@ input[type=range]{width:100%}
 .focusstats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .focusstats span{font-size:.62rem;font-weight:700;padding:4px 7px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
 .mclink{display:inline-block;margin-top:8px;font-size:.72rem;font-weight:700;color:var(--acc);text-decoration:none}
+.rankbar{display:flex;gap:7px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.rankbar::-webkit-scrollbar{display:none}
+.rankchip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 10px;font-size:.72rem;font-weight:700;cursor:pointer}
+.rankchip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.playercell{display:flex;align-items:center;gap:8px;text-align:left}
+.playerpic{width:34px;height:34px;border-radius:50%;overflow:hidden;background:var(--chip);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.68rem;font-weight:800}
+.playerpic img{width:100%;height:100%;object-fit:cover}
+.playerpic.jersey img{object-fit:contain;padding:4px}
+.playermeta{min-width:0}
+.playermeta b{display:block;font-size:.78rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.playermeta span{display:block;font-size:.62rem;color:var(--mut);margin-top:2px}
 @media (max-width:520px){
   .pitch-row{gap:6px}
   .pc{width:62px;padding:6px 3px}
@@ -646,6 +657,9 @@ let curDay = null, grpProj = false, simCache = null, curView = "matches";
 const matchCenterCache = {};
 const matchCenterPending = {};
 const matchCenterView = {};
+let playerRankCache = null;
+let playerRankPending = false;
+let playerRankCategory = "overall";
 let activeSheetMatch = null;
 
 function allFixtures(){
@@ -812,12 +826,198 @@ function slotLabel(sl){
   if(sl.startsWith("L")) return "Loser M"+sl.slice(1);
   return sl;
 }
+const PLAYER_RANK_CATS = {
+  overall:{label:"Overall", metric:"Score"},
+  goals:{label:"Goals", metric:"Goals"},
+  assists:{label:"Assists", metric:"Assists"},
+  attackers:{label:"Attackers", metric:"Attack"},
+  defenders:{label:"Defenders", metric:"Defense"},
+  goalies:{label:"Goalies", metric:"Saves"},
+  discipline:{label:"Cards", metric:"Cards"}
+};
+const PLAYER_STAT_ALIASES = {
+  goals:["totalGoals","goals","goal"],
+  assists:["goalAssists","assists","assist"],
+  shots:["totalShots","shots"],
+  onTarget:["shotsOnTarget","shots on target"],
+  saves:["saves","totalSaves"],
+  tackles:["totalTackles","tackles","wonTackles","tacklesWon"],
+  interceptions:["interceptions"],
+  clearances:["clearances"],
+  blocks:["blockedShots","blocks","blocked shots"],
+  fouls:["foulsCommitted","fouls committed","fouls"],
+  yellow:["yellowCards","yellow cards"],
+  red:["redCards","red cards"],
+  goalsAgainst:["goalsConceded","goals against"]
+};
+function statKey(name){
+  return String(name||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+function rankStat(stats, names){
+  if(!stats) return 0;
+  const byKey = {};
+  for(const k in stats) byKey[statKey(k)] = stats[k];
+  for(const name of names){
+    const raw = stats[name] ?? byKey[statKey(name)];
+    if(raw == null || raw === "") continue;
+    const n = typeof raw==="number" ? raw : parseFloat(String(raw).replace(/[^\d.-]/g,""));
+    if(Number.isFinite(n)) return n;
+  }
+  return 0;
+}
+function playerRole(pos){
+  const p = String(pos||"").toUpperCase();
+  if(["G","GK"].includes(p)) return "goalie";
+  if(["D","DF","CB","LB","RB","LWB","RWB"].includes(p)) return "defender";
+  if(["M","MF","CM","DM","AM","LM","RM"].includes(p)) return "midfielder";
+  if(["F","FW","ST","CF","LW","RW"].includes(p)) return "forward";
+  return "player";
+}
+function rankableMatches(){
+  const now = Date.now();
+  return allFixtures().list.filter(m=>{
+    const r = state.results[m.no] || {};
+    const kicked = new Date(m.d).getTime() < now + 3*3600000;
+    return m.h && m.a && !m.projected && (kicked || state.eventMap[m.no] || r.status==="FT" || r.status==="LIVE");
+  }).sort((a,b)=>a.no-b.no);
+}
+function addPlayerTotals(row, stats){
+  row.statGoals += rankStat(stats, PLAYER_STAT_ALIASES.goals);
+  row.statAssists += rankStat(stats, PLAYER_STAT_ALIASES.assists);
+  row.shots += rankStat(stats, PLAYER_STAT_ALIASES.shots);
+  row.onTarget += rankStat(stats, PLAYER_STAT_ALIASES.onTarget);
+  row.saves += rankStat(stats, PLAYER_STAT_ALIASES.saves);
+  row.tackles += rankStat(stats, PLAYER_STAT_ALIASES.tackles);
+  row.interceptions += rankStat(stats, PLAYER_STAT_ALIASES.interceptions);
+  row.clearances += rankStat(stats, PLAYER_STAT_ALIASES.clearances);
+  row.blocks += rankStat(stats, PLAYER_STAT_ALIASES.blocks);
+  row.fouls += rankStat(stats, PLAYER_STAT_ALIASES.fouls);
+  row.yellow += rankStat(stats, PLAYER_STAT_ALIASES.yellow);
+  row.red += rankStat(stats, PLAYER_STAT_ALIASES.red);
+  row.goalsAgainst += rankStat(stats, PLAYER_STAT_ALIASES.goalsAgainst);
+}
+function playerRankKey(player, side){
+  return player.id ? "id:"+player.id : "name:"+statKey(player.name)+"|"+statKey(side.abbr||side.name);
+}
+function getRankPlayer(map, player, side){
+  const key = playerRankKey(player, side);
+  if(!map[key]){
+    map[key] = {
+      key,
+      id: player.id || "",
+      name: player.name || "Unknown player",
+      short: player.short || player.name || "Unknown player",
+      team: side.abbr || side.name || "",
+      teamName: side.name || "",
+      pos: player.position || "",
+      role: playerRole(player.position),
+      image: player.image || side.logo || "",
+      imageMode: player.imageMode || (player.image ? "cover" : "contain"),
+      link: player.link || "",
+      apps:0, starts:0, statGoals:0, eventGoals:0, statAssists:0, eventAssists:0,
+      shots:0, onTarget:0, saves:0, tackles:0, interceptions:0, clearances:0, blocks:0,
+      fouls:0, yellow:0, red:0, goalsAgainst:0
+    };
+  }
+  const row = map[key];
+  if(player.image && !row.image) row.image = player.image;
+  if(player.link && !row.link) row.link = player.link;
+  return row;
+}
+function aggregatePlayerRankings(summaries){
+  const map = {};
+  for(const data of summaries){
+    for(const sideKey of ["home","away"]){
+      const side = data.lineups && data.lineups[sideKey];
+      if(!side) continue;
+      for(const player of side.players || []){
+        const row = getRankPlayer(map, player, side);
+        row.apps++;
+        if(player.starter) row.starts++;
+        addPlayerTotals(row, player.stats || {});
+      }
+    }
+    for(const goal of data.goals || []){
+      const scorer = Object.values(map).find(row => (goal.id && row.id===goal.id) || (statKey(row.name)===statKey(goal.player) && (!goal.teamAbbr || row.team===goal.teamAbbr)));
+      if(scorer){
+        if(goal.ownGoal) scorer.ownGoals = (scorer.ownGoals||0) + 1;
+        else scorer.eventGoals++;
+      }
+      if(goal.assist){
+        const assister = Object.values(map).find(row => statKey(row.name)===statKey(goal.assist));
+        if(assister) assister.eventAssists++;
+      }
+    }
+  }
+  return Object.values(map).map(row=>{
+    row.goals = Math.max(row.statGoals, row.eventGoals);
+    row.assists = Math.max(row.statAssists, row.eventAssists);
+    row.attack = row.goals*8 + row.assists*5 + row.onTarget*1.4 + row.shots*.35;
+    row.defense = row.tackles*1.4 + row.interceptions*1.8 + row.clearances*1.1 + row.blocks*1.6;
+    row.keeping = row.saves*2 - row.goalsAgainst*.4;
+    row.cards = row.yellow + row.red*2;
+    row.overall = row.attack + row.defense + row.keeping + row.starts*.25 + row.apps*.1 - row.cards*.8 - row.fouls*.08;
+    return row;
+  });
+}
+function rankedPlayers(category){
+  if(!playerRankCache) return [];
+  const cat = category || playerRankCategory;
+  let rows = [...playerRankCache.players];
+  if(cat==="defenders") rows = rows.filter(p=>p.role==="defender" || p.defense>0);
+  if(cat==="goalies") rows = rows.filter(p=>p.role==="goalie" || p.saves>0);
+  const metric = p => cat==="goals" ? p.goals :
+    cat==="assists" ? p.assists :
+    cat==="attackers" ? p.attack :
+    cat==="defenders" ? p.defense :
+    cat==="goalies" ? p.saves :
+    cat==="discipline" ? p.cards :
+    p.overall;
+  return rows.map(p=>({...p, metric:metric(p)})).filter(p=>p.metric>0 || cat==="overall").sort((a,b)=>b.metric-a.metric || b.goals-a.goals || b.assists-a.assists);
+}
+function renderPlayerRankings(){
+  const cats = Object.entries(PLAYER_RANK_CATS).map(([key,cat])=>`<button class="rankchip ${playerRankCategory===key?"on":""}" data-rank-cat="${key}">${cat.label}</button>`).join("");
+  let body = "";
+  if(playerRankPending){
+    body = `<div class="mc-loading">Loading ESPN player stats across played matches...</div>`;
+  } else if(!playerRankCache){
+    body = `<div class="note">Loads public ESPN match summaries for matches played so far, then ranks players by goals, assists, attacking output, defensive actions, saves, and cards.</div>
+      <button class="btn sm" id="loadranks">Load player rankings</button>`;
+  } else {
+    const rows = rankedPlayers(playerRankCategory).slice(0,20);
+    const meta = PLAYER_RANK_CATS[playerRankCategory] || PLAYER_RANK_CATS.overall;
+    body = `<div class="rankbar">${cats}</div>
+      <div class="note">${playerRankCache.matches} match summaries scanned. Updated ${new Date(playerRankCache.updatedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}. <button class="btn sm sec" id="loadranks" style="margin-left:6px">Refresh</button></div>
+      ${rows.length?`<table><tr><th style="text-align:left">Player</th><th>${meta.metric}</th><th>G</th><th>A</th><th>Saves</th></tr>
+      ${rows.map((p,i)=>`<tr><td><div class="playercell">${renderAvatar(p.image, p.imageMode, "playerpic", p.name, p.team)}<div class="playermeta"><b>${i+1}. ${esc(p.name)}</b><span>${esc(p.team)} ${p.pos?esc(p.pos):""} · ${p.apps} app${p.apps===1?"":"s"}</span></div></div></td><td><b>${Number.isInteger(p.metric)?p.metric:p.metric.toFixed(1)}</b></td><td>${p.goals||"-"}</td><td>${p.assists||"-"}</td><td>${p.saves||"-"}</td></tr>`).join("")}</table>`:`<div class="mc-empty">No player rows in this category yet.</div>`}`;
+  }
+  return `<div class="card" style="padding:14px"><div class="grouphead" style="padding:0 0 4px">Player rankings so far</div>${body}</div>`;
+}
+async function loadPlayerRankings(force){
+  if(playerRankPending) return;
+  if(playerRankCache && !force){ renderStats(); return; }
+  playerRankPending = true;
+  renderStats();
+  try{
+    const matches = rankableMatches();
+    const summaries = (await Promise.all(matches.map(m=>loadMatchCenter(m.no, m).then(data=>{
+      if(data){ data.fetchedAt = Date.now(); matchCenterCache[m.no] = data; }
+      return data;
+    }).catch(()=>null)))).filter(Boolean);
+    playerRankCache = {players:aggregatePlayerRankings(summaries), matches:summaries.length, updatedAt:Date.now()};
+    if(!summaries.length) toast("No player stats available yet");
+  } finally {
+    playerRankPending = false;
+    renderStats();
+  }
+}
 function renderStats(){
   let html = `<div class="card" style="padding:14px">
     <h3 style="font-size:.95rem">🎲 Tournament simulator</h3>
     <div class="note">Runs the whole remaining tournament 2,000 times with the live model (updated ratings, form, your news adjustments). Re-run any time — odds shift as real results arrive.</div>
     <button class="btn" id="runsim">${simCache?"Re-run":"Run"} 2,000 simulations</button>
   </div>`;
+  html += renderPlayerRankings();
   if(simCache){
     const rows = Object.entries(simCache).map(([t,v])=>({t,...v})).sort((a,b)=>b.champ-a.champ).slice(0,20);
     const mx = rows[0].champ||1;
@@ -839,6 +1039,9 @@ function renderStats(){
   });
   html += `</table></div>`;
   $("#statsmain").innerHTML = html;
+  const loadRanks = $("#loadranks");
+  if(loadRanks) loadRanks.onclick = () => loadPlayerRankings(true);
+  $("#statsmain").querySelectorAll("[data-rank-cat]").forEach(btn=>btn.onclick=()=>{ playerRankCategory=btn.dataset.rankCat; renderStats(); });
   $("#runsim").onclick = () => { $("#runsim").textContent="Simulating…"; setTimeout(()=>{ simCache=simulate(2000); renderStats(); toast("2,000 tournaments simulated"); },30); };
   $("#statsmain").querySelectorAll("td.tn").forEach(td=>td.onclick=()=>openTeam(td.dataset.t));
 }
